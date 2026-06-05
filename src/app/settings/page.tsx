@@ -73,7 +73,7 @@ export default function SettingsPage() {
 
   return (
     <>
-      <Topbar title="설정" description="US Expat Hub 환경 설정" />
+      <Topbar title="설정" description="Hanwha Global Insurance Intelligence 환경 설정" />
 
       <div className="flex-1 overflow-y-auto p-5 space-y-4 max-w-2xl">
 

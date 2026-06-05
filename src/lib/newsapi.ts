@@ -45,7 +45,7 @@ function parseDate(dateStr: string): number {
 async function fetchSingleRss(source: { url: string; source: string }): Promise<NewsArticle[]> {
   try {
     const res = await fetch(source.url, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; USExpatHub/1.0)' },
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; HanwhaGlobal/1.0)' },
       signal: AbortSignal.timeout(6000),
       cache: 'no-store',
     })

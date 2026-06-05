@@ -35,7 +35,7 @@ export default function Sidebar() {
           className="h-8 w-auto object-contain"
           priority
         />
-        <p className="text-[10px] text-text-secondary mt-1.5 leading-tight">미국 주재원 통합 플랫폼</p>
+        <p className="text-[10px] text-text-secondary mt-1.5 leading-tight">한화손보 글로벌 통합 지원 플랫폼</p>
       </div>
 
       {/* 네비게이션 */}

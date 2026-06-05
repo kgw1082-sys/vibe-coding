@@ -23,7 +23,7 @@ interface HistoryItem {
   createdAt: string
 }
 
-const HISTORY_KEY = 'us-expat-hub:email-history'
+const HISTORY_KEY = 'hanwha-global:email-history'
 const MAX_HISTORY = 5
 
 function loadHistory(): HistoryItem[] {

@@ -67,7 +67,7 @@ export default function DashboardPage() {
 
   return (
     <>
-      <Topbar title="대시보드" description="US Expat Insurance Intelligence" />
+      <Topbar title="대시보드" description="한화손보 글로벌 통합 지원 플랫폼" />
 
       <div className="flex-1 overflow-y-auto p-5 space-y-6 max-w-3xl">
 

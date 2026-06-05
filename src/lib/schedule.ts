@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'us-expat-hub:schedule'
+const STORAGE_KEY = 'hanwha-global:schedule'
 
 export interface ScheduleEvent {
   id: string

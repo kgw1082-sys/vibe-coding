@@ -1,5 +1,5 @@
 // src/lib/user-settings.ts
-const STORAGE_KEY = 'us-expat-hub:settings'
+const STORAGE_KEY = 'hanwha-global:settings'
 
 export interface KeywordEntry {
   keyword: string

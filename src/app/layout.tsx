@@ -5,11 +5,11 @@ import { AuthProvider } from '@/components/providers/AuthProvider'
 import LayoutShell from '@/components/providers/LayoutShell'
 
 export const metadata: Metadata = {
-  title: 'US Expat Hub',
-  description: 'Insurance Intelligence for US Expatriates',
+  title: 'Hanwha Global Insurance Intelligence',
+  description: '한화손보 글로벌 통합 지원 플랫폼',
   openGraph: {
-    title: 'US Expat Hub',
-    description: 'Insurance Intelligence for US Expatriates',
+    title: 'Hanwha Global Insurance Intelligence',
+    description: '한화손보 글로벌 통합 지원 플랫폼',
     images: [{ url: '/images/hanwha-insurance-logo.jpg' }],
   },
 }
