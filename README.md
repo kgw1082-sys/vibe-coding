@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# US Expat Hub
 
-## Getting Started
+미국 파견 주재원을 위한 보험 인텔리전스 플랫폼.
 
-First, run the development server:
+## 주요 기능
+
+- **뉴스 피드** — 관심 태그 기반 보험 업계 뉴스 + Claude AI 인사이트
+- **Clause Finder** — 특약 텍스트 업로드 → RED/ORANGE 리스크 조항 자동 탐지
+- **법령 조회** — 미국 보험법령 키워드 검색 + AI 위반 여부 판단
+- **설정** — 관심 태그·키워드 관리 (브라우저 localStorage 저장)
+
+## 로컬 실행
+
+### 1. 저장소 클론
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/kgw1082-sys/vibe-coding
+cd vibe-coding
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. 환경변수 설정
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+`.env.local` 파일을 프로젝트 루트에 생성하고 아래 값을 채웁니다:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+# 필수
+ANTHROPIC_API_KEY=sk-ant-...
 
-## Learn More
+# 선택 (없으면 해당 기능 비활성화)
+NEWSAPI_KEY=...
+CONGRESS_API_KEY=...
+UPSTASH_REDIS_REST_URL=https://...
+UPSTASH_REDIS_REST_TOKEN=...
+```
 
-To learn more about Next.js, take a look at the following resources:
+| 키 | 발급처 |
+|---|---|
+| `ANTHROPIC_API_KEY` | [console.anthropic.com](https://console.anthropic.com/settings/keys) |
+| `NEWSAPI_KEY` | [newsapi.org/register](https://newsapi.org/register) |
+| `CONGRESS_API_KEY` | [api.congress.gov/sign-up](https://api.congress.gov/sign-up/) |
+| `UPSTASH_REDIS_REST_URL` + `TOKEN` | [upstash.com](https://upstash.com/) — 무료 플랜 |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 3. 개발 서버 시작
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+pnpm dev
+```
 
-## Deploy on Vercel
+브라우저에서 [http://localhost:3000](http://localhost:3000) 접속.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Vercel 배포
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fkgw1082-sys%2Fvibe-coding)
+
+1. 위 버튼 클릭 → Vercel 로그인
+2. **Environment Variables** 섹션에 위 환경변수 입력
+3. **Deploy** 클릭
+
+> `app/api/clause/scan` 및 `app/api/legal/query` 함수는 `vercel.json`에 의해 최대 30초 실행 시간이 허용됩니다.
