@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import Topbar from '@/components/layout/Topbar'
+import { useAuth } from '@/components/providers/AuthProvider'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
@@ -34,6 +35,7 @@ function todayLabel() {
 
 export default function DashboardPage() {
   const [today, setToday] = useState('')
+  const { user } = useAuth()
 
   useEffect(() => {
     setToday(todayLabel())
@@ -47,7 +49,7 @@ export default function DashboardPage() {
 
         {/* [1] 웰컴 헤더 */}
         <div>
-          <h2 className="text-xl font-bold text-text-primary">안녕하세요, 홍길동님 👋</h2>
+          <h2 className="text-xl font-bold text-text-primary">안녕하세요, {user?.name ?? '...'}님 👋</h2>
           <p className="text-sm text-text-muted mt-0.5">{today}</p>
         </div>
 

@@ -4,8 +4,9 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import {
-  LayoutDashboard, Newspaper, FileSearch, Scale, Settings, Mail, BookOpen,
+  LayoutDashboard, Newspaper, FileSearch, Scale, Settings, Mail, BookOpen, Wrench, LogOut,
 } from 'lucide-react'
+import { useAuth } from '@/components/providers/AuthProvider'
 
 const navItems = [
   { href: '/', label: '대시보드', icon: LayoutDashboard },
@@ -19,6 +20,7 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname()
+  const { user, logout } = useAuth()
 
   return (
     <aside className="hidden md:flex w-[220px] min-h-screen flex-col bg-bg-surface border-r border-border-color flex-shrink-0">
@@ -36,7 +38,7 @@ export default function Sidebar() {
       </div>
 
       {/* 네비게이션 */}
-      <nav className="flex-1 px-3 py-4 space-y-0.5">
+      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
         <p className="text-[10px] font-semibold text-text-disabled uppercase tracking-widest px-3 pb-2">
           메뉴
         </p>
@@ -57,18 +59,45 @@ export default function Sidebar() {
             </Link>
           )
         })}
+
+        {/* 관리자 메뉴 */}
+        {user?.role === 'admin' && (
+          <>
+            <p className="text-[10px] font-semibold text-text-disabled uppercase tracking-widest px-3 pb-2 pt-4">
+              관리
+            </p>
+            <Link
+              href="/admin"
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                pathname === '/admin'
+                  ? 'bg-accent/15 text-accent'
+                  : 'text-text-secondary hover:bg-black/[0.04] hover:text-text-primary'
+              }`}
+            >
+              <Wrench size={17} className="flex-shrink-0" />
+              운영자 관리
+            </Link>
+          </>
+        )}
       </nav>
 
       {/* 사용자 프로필 */}
       <div className="px-3 pb-4 border-t border-border-color pt-3">
-        <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-black/[0.04] cursor-pointer transition-colors">
+        <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg">
           <div className="w-8 h-8 rounded-full bg-accent/25 flex items-center justify-center text-xs font-bold text-accent flex-shrink-0">
-            US
+            {user?.name?.[0] ?? 'U'}
           </div>
-          <div className="min-w-0">
-            <p className="text-xs font-semibold text-text-primary truncate">US 보험 담당자</p>
-            <p className="text-[10px] text-text-secondary truncate">user@expathub.com</p>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-semibold text-text-primary truncate">{user?.name ?? '...'}</p>
+            <p className="text-[10px] text-text-secondary truncate">{user?.department ?? ''}</p>
           </div>
+          <button
+            onClick={logout}
+            className="text-text-disabled hover:text-text-primary transition-colors flex-shrink-0"
+            title="로그아웃"
+          >
+            <LogOut size={14} />
+          </button>
         </div>
       </div>
     </aside>
