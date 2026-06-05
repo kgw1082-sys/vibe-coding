@@ -1,0 +1,37 @@
+'use client'
+
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { LayoutDashboard, Newspaper, FileSearch, Scale, Settings } from 'lucide-react'
+
+const navItems = [
+  { href: '/', label: '대시보드', icon: LayoutDashboard },
+  { href: '/news', label: '뉴스', icon: Newspaper },
+  { href: '/clause', label: 'Clause', icon: FileSearch },
+  { href: '/legal', label: '법령', icon: Scale },
+  { href: '/settings', label: '설정', icon: Settings },
+]
+
+export default function MobileTabBar() {
+  const pathname = usePathname()
+
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 z-50 flex md:hidden bg-bg-surface border-t border-white/10 safe-area-bottom">
+      {navItems.map(({ href, label, icon: Icon }) => {
+        const active = pathname === href
+        return (
+          <Link
+            key={href}
+            href={href}
+            className={`flex-1 flex flex-col items-center justify-center py-2 gap-0.5 transition-colors ${
+              active ? 'text-accent' : 'text-white/40'
+            }`}
+          >
+            <Icon size={20} />
+            <span className="text-[10px] font-medium">{label}</span>
+          </Link>
+        )
+      })}
+    </nav>
+  )
+}

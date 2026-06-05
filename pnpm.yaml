@@ -1,0 +1,5 @@
+onlyBuiltDependencies:
+  - unrs-resolver
+  - msw
+  - sharp
+  - esbuild
