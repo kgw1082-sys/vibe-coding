@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input'
 import { RefreshCw, Sparkles, Bookmark, BookmarkCheck, ExternalLink, Plus, X, AlertCircle } from 'lucide-react'
 import { NEWS_TAGS } from '@/lib/mock-data'
+import { loadSettings } from '@/lib/user-settings'
 import type { NewsArticle, NewsResponse } from '@/types'
 
 // ── 스켈레톤 카드 ───────────────────────────────────────────────────────
@@ -167,7 +168,10 @@ function AddTagModal({ onAdd, onClose }: { onAdd: (tag: string) => void; onClose
 
 // ── 메인 페이지 ─────────────────────────────────────────────────────────
 export default function NewsPage() {
-  const [selectedTag, setSelectedTag] = useState('전체')
+  const [selectedTag, setSelectedTag] = useState<string>(() => {
+    const saved = loadSettings()
+    return saved.newsTags.length > 0 ? saved.newsTags[0] : '전체'
+  })
   const [sortBy, setSortBy]           = useState<'publishedAt' | 'relevancy'>('publishedAt')
   const [articles, setArticles]       = useState<NewsArticle[]>([])
   const [cachedAt, setCachedAt]       = useState<string | null>(null)
@@ -185,12 +189,19 @@ export default function NewsPage() {
     try {
       const params = new URLSearchParams({ tags: tag, sortBy: sort })
       const res = await fetch(`/api/news?${params}`, { signal: abortRef.current.signal })
-      if (!res.ok) throw new Error('서버 오류')
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({ error: '뉴스를 불러오지 못했습니다' }))
+        toast.error(body.error ?? '뉴스를 불러오지 못했습니다')
+        setError(body.error ?? '뉴스를 불러올 수 없습니다.')
+        setArticles([])
+        return
+      }
       const data: NewsResponse & { fromCache?: boolean } = await res.json()
       setArticles(data.articles)
       setCachedAt(data.cachedAt)
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') return
+      toast.error('네트워크 오류가 발생했습니다')
       setError('뉴스를 불러올 수 없습니다.')
       setArticles([])
     } finally {
