@@ -4,10 +4,10 @@ import { createHash } from 'crypto'
 import { fetchNews } from '@/lib/newsapi'
 import redis from '@/lib/redis'
 import anthropic from '@/lib/anthropic'
-import { missingApiKey, rateLimited, internalError, isRateLimit } from '@/lib/api-error'
+import { internalError } from '@/lib/api-error'
 import type { NewsArticle, NewsResponse } from '@/types'
 
-const CACHE_TTL = 3600
+const CACHE_TTL = 1800 // 30분 캐시 (RSS는 자주 갱신됨)
 
 async function generateInsight(article: NewsArticle): Promise<string> {
   if (!process.env.ANTHROPIC_API_KEY) return ''
@@ -30,22 +30,29 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const tag = searchParams.get('tag') || '전체'
-    const cacheKey = `news:${createHash('md5').update(tag).digest('hex')}`
+    const cacheKey = `news:v2:${createHash('md5').update(tag).digest('hex')}`
 
     const cached = await redis.get<NewsResponse>(cacheKey).catch(() => null)
     if (cached) return NextResponse.json(cached)
 
-    if (!process.env.NEWSAPI_KEY) return missingApiKey('뉴스 API')
+    // RSS 수집 (NEWSAPI_KEY 불필요)
+    const articles = await fetchNews(tag === '전체' ? undefined : tag)
 
-    const articles = await fetchNews([tag])
+    // 상위 20건만 AI 인사이트 생성 (비용 절감)
+    const top20 = articles.slice(0, 20)
+    const rest = articles.slice(20)
+
     const withInsights = await Promise.all(
-      articles.map(async (a) => ({ ...a, insight: await generateInsight(a) }))
+      top20.map(async (a) => ({ ...a, insight: await generateInsight(a) }))
     )
-    const result: NewsResponse = { articles: withInsights, cachedAt: new Date().toISOString() }
+
+    const result: NewsResponse = {
+      articles: [...withInsights, ...rest],
+      cachedAt: new Date().toISOString(),
+    }
     await redis.set(cacheKey, result, { ex: CACHE_TTL }).catch(() => null)
     return NextResponse.json(result)
   } catch (err) {
-    if (isRateLimit(err)) return rateLimited()
     console.error('[/api/news]', err)
     return internalError()
   }

@@ -1,112 +1,104 @@
-import axios from 'axios'
 import { parseStringPromise } from 'xml2js'
 import type { NewsArticle } from '@/types'
 
-const NEWS_API_BASE = 'https://newsapi.org/v2'
-const RSS_FALLBACK_URL = 'https://www.insurancejournal.com/feed/'
+// ── 신뢰할 수 있는 보험 전문 RSS 피드 ──────────────────────────────────
+const RSS_SOURCES = [
+  { url: 'https://www.insurancejournal.com/feed/',            source: 'Insurance Journal' },
+  { url: 'https://www.reinsurancene.ws/feed/',                source: 'Reinsurance News' },
+  { url: 'https://www.carriermanagement.com/feed/',           source: 'Carrier Management' },
+  { url: 'https://www.businessinsurance.com/rss/news.rss',   source: 'Business Insurance' },
+  { url: 'https://www.insurancebusinessmag.com/rss/',        source: 'Insurance Business' },
+  { url: 'https://news.google.com/rss/search?q=reinsurance+insurance+US&hl=en-US&gl=US&ceid=US:en', source: 'Google News' },
+]
 
-const TAG_MAP: Record<string, string> = {
-  'p&c':        'P&C Insurance',
-  property:     'P&C Insurance',
-  casualty:     'P&C Insurance',
-  reinsurance:  'Reinsurance',
-  life:         'Life Insurance',
-  health:       'Healthcare',
-  medicare:     'Healthcare',
-  medicaid:     'Healthcare',
-  tax:          'Tax/IRS',
-  irs:          'Tax/IRS',
-  fbar:         'FBAR',
-  fatca:        'FATCA',
-  visa:         'Visa/Immigration',
-  immigration:  'Visa/Immigration',
-  legal:        'Legal',
-  regulation:   'Regulation',
-  lloyds:       'Lloyd\'s/London',
-  catastrophe:  'CAT/Catastrophe',
-  cyber:        'Cyber',
-  workers:      'Workers\' Comp',
+const TAG_MAP: Record<string, string[]> = {
+  'P&C Insurance':    ['p&c', 'property', 'casualty', 'homeowner', 'auto insurance', 'liability'],
+  'Reinsurance':      ['reinsurance', 'treaty', 'facultative', 'retrocession', 'cedent', 'cession'],
+  'Life Insurance':   ['life insurance', 'annuity', 'whole life', 'term life'],
+  'Healthcare':       ['health insurance', 'medicare', 'medicaid', 'aca', 'affordable care'],
+  'Cyber':            ['cyber', 'ransomware', 'data breach', 'cybersecurity'],
+  'CAT/Catastrophe':  ['catastrophe', 'hurricane', 'flood', 'earthquake', 'tornado', 'wildfire', 'nat cat'],
+  'Regulation':       ['regulation', 'regulatory', 'naic', 'department of insurance', 'compliance'],
+  "Lloyd's/London":   ["lloyd's", "lloyds", 'london market', 'london insurance'],
+  'Legal':            ['lawsuit', 'litigation', 'court', 'verdict', 'settlement', 'ofac'],
+  'Tax/IRS':          ['irs', 'tax', 'fbar', 'fatca', 'expat tax'],
 }
 
-function extractTags(title: string, description = ''): string[] {
+export function extractTags(title: string, description = ''): string[] {
   const text = `${title} ${description}`.toLowerCase()
   const found = new Set<string>()
-  for (const [key, label] of Object.entries(TAG_MAP)) {
-    if (text.includes(key)) found.add(label)
+  for (const [label, keywords] of Object.entries(TAG_MAP)) {
+    if (keywords.some((k) => text.includes(k))) found.add(label)
   }
   return Array.from(found).slice(0, 4)
 }
 
-// ── NewsAPI ────────────────────────────────────────────────────────────
-export async function fetchNews(
-  tags: string[],
-  sortBy: 'publishedAt' | 'relevancy' = 'publishedAt',
-): Promise<NewsArticle[]> {
-  const apiKey = process.env.NEWSAPI_KEY
-  if (!apiKey) return fetchRss()
-
-  // 태그를 NewsAPI q 쿼리로 변환
-  const tagQueryMap: Record<string, string> = {
-    'P&C Insurance':      'P&C insurance OR property casualty insurance',
-    'Reinsurance':        'reinsurance',
-    'Life Insurance':     'life insurance expatriate',
-    'Healthcare':         'US health insurance expat',
-    'Tax/IRS':            'US expat tax IRS FBAR',
-    'FBAR':               'FBAR foreign bank account',
-    'FATCA':              'FATCA foreign account',
-    'Visa/Immigration':   'US visa immigration',
-    'Legal':              'US insurance regulation legal',
-    'Regulation':         'insurance regulation US',
-    "Lloyd's/London":     "Lloyd's London insurance",
-    'CAT/Catastrophe':    'catastrophe insurance hurricane flood',
-    'Cyber':              'cyber insurance breach',
-    "Workers' Comp":      "workers compensation insurance",
-  }
-
-  const effectiveTags = tags.filter((t) => t !== '전체')
-  const q =
-    effectiveTags.length > 0
-      ? effectiveTags.map((t) => tagQueryMap[t] ?? t).join(' OR ')
-      : 'US expat insurance OR reinsurance OR P&C insurance OR health insurance OR IRS expatriate'
-
-  try {
-    const res = await axios.get(`${NEWS_API_BASE}/everything`, {
-      params: { q, language: 'en', sortBy, pageSize: 20, apiKey },
-      timeout: 8000,
-    })
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return res.data.articles.map((a: any, i: number): NewsArticle => ({
-      id:          `newsapi-${i}-${Date.now()}`,
-      title:       a.title ?? '',
-      description: a.description ?? '',
-      url:         a.url ?? '',
-      publishedAt: a.publishedAt ?? '',
-      source:      a.source?.name ?? 'Unknown',
-      tags:        extractTags(a.title ?? '', a.description ?? ''),
-    }))
-  } catch {
-    return fetchRss()
-  }
-}
-
-// ── Insurance Journal RSS 폴백 ─────────────────────────────────────────
-async function fetchRss(): Promise<NewsArticle[]> {
-  const res  = await axios.get(RSS_FALLBACK_URL, { timeout: 8000, responseType: 'text' })
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const xml: any = await parseStringPromise(res.data, { explicitArray: false })
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const items: any[] = [].concat(xml?.rss?.channel?.item ?? [])
-  return items.slice(0, 20).map((item, i): NewsArticle => ({
-    id:          `rss-${i}-${Date.now()}`,
-    title:       item.title ?? '',
-    description: stripHtml(item.description ?? ''),
-    url:         item.link ?? '',
-    publishedAt: item.pubDate ?? '',
-    source:      'Insurance Journal',
-    tags:        extractTags(item.title ?? '', item.description ?? ''),
-  }))
-}
-
 function stripHtml(html: string): string {
-  return html.replace(/<[^>]*>/g, '').replace(/&[a-z]+;/gi, ' ').trim()
+  return html.replace(/<[^>]*>/g, '').replace(/&amp;/g, '&').replace(/&[a-z]+;/gi, ' ').trim()
+}
+
+function parseDate(dateStr: string): number {
+  try { return new Date(dateStr).getTime() } catch { return 0 }
+}
+
+// ── 단일 RSS 피드 fetch ─────────────────────────────────────────────────
+async function fetchSingleRss(source: { url: string; source: string }): Promise<NewsArticle[]> {
+  try {
+    const res = await fetch(source.url, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; USExpatHub/1.0)' },
+      signal: AbortSignal.timeout(6000),
+      cache: 'no-store',
+    })
+    if (!res.ok) return []
+    const text = await res.text()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const xml: any = await parseStringPromise(text, { explicitArray: false, trim: true })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const items: any[] = [].concat(
+      xml?.rss?.channel?.item ?? xml?.feed?.entry ?? []
+    )
+    return items.slice(0, 15).map((item, i): NewsArticle => {
+      const title = stripHtml(
+        typeof item.title === 'object' ? item.title._ ?? item.title['#text'] ?? '' : item.title ?? ''
+      )
+      const description = stripHtml(
+        typeof item.description === 'object' ? item.description._ ?? '' : item.description ?? item.summary ?? ''
+      )
+      const url = item.link?.$ ? item.link.$.href : (typeof item.link === 'string' ? item.link : item.guid ?? '')
+      const pubDate = item.pubDate ?? item.published ?? item.updated ?? ''
+      return {
+        id:          `${source.source}-${i}-${parseDate(pubDate)}`,
+        title,
+        description,
+        url,
+        publishedAt: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
+        source:      source.source,
+        tags:        extractTags(title, description),
+      }
+    }).filter((a) => a.title && a.url)
+  } catch {
+    return []
+  }
+}
+
+// ── 전체 피드 병렬 수집 → 최신순 정렬 ────────────────────────────────────
+export async function fetchNews(tagFilter?: string): Promise<NewsArticle[]> {
+  const results = await Promise.allSettled(RSS_SOURCES.map(fetchSingleRss))
+  const all = results.flatMap((r) => r.status === 'fulfilled' ? r.value : [])
+
+  // 중복 URL 제거
+  const seen = new Set<string>()
+  const unique = all.filter((a) => {
+    if (!a.url || seen.has(a.url)) return false
+    seen.add(a.url)
+    return true
+  })
+
+  // 태그 필터링
+  const filtered = tagFilter && tagFilter !== '전체'
+    ? unique.filter((a) => a.tags.some((t) => t === tagFilter) || a.tags.length === 0)
+    : unique
+
+  // 최신순 정렬
+  return filtered.sort((a, b) => parseDate(b.publishedAt) - parseDate(a.publishedAt))
 }

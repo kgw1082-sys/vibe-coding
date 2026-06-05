@@ -11,8 +11,8 @@ import {
   Newspaper, FileSearch, Scale, Mail, BookOpen, Settings,
   Plus, ChevronRight, Clock, TrendingUp, CalendarDays, Trash2,
 } from 'lucide-react'
-import { MOCK_RECENT_NEWS } from '@/lib/mock-data'
 import { getEventsForDate, deleteEvent, toDateStr, type ScheduleEvent } from '@/lib/schedule'
+import type { NewsArticle } from '@/types'
 
 const SHORTCUTS = [
   { href: '/calendar', icon: CalendarDays, label: '캘린더' },
@@ -40,6 +40,7 @@ const DOT_COLOR: Record<string, string> = {
 export default function DashboardPage() {
   const [todayStr, setTodayStr] = useState('')
   const [todayEvents, setTodayEvents] = useState<ScheduleEvent[]>([])
+  const [news, setNews] = useState<NewsArticle[]>([])
   const { user } = useAuth()
   const router = useRouter()
 
@@ -52,6 +53,11 @@ export default function DashboardPage() {
   useEffect(() => {
     setTodayStr(todayLabel())
     refreshEvents()
+    // 실시간 뉴스 fetch
+    fetch('/api/news')
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => { if (data?.articles) setNews(data.articles.slice(0, 3)) })
+      .catch(() => null)
   }, [refreshEvents])
 
   const handleDelete = (id: string) => {
@@ -133,16 +139,25 @@ export default function DashboardPage() {
           </div>
           <Card className="bg-bg-card border-border-color">
             <CardContent className="py-2 px-4">
-              {MOCK_RECENT_NEWS.slice(0, 3).map((article, i) => (
-                <div key={article.id}
-                  className={`py-3 ${i < 2 ? 'border-b border-border-color/50' : ''}`}>
-                  <p className="text-sm text-text-primary font-medium leading-snug line-clamp-2">
+              {news.length === 0 ? (
+                <div className="py-4 space-y-3">
+                  {[1,2,3].map((i) => (
+                    <div key={i} className={`py-3 ${i < 3 ? 'border-b border-border-color/50' : ''}`}>
+                      <div className="h-3.5 w-3/4 bg-black/[0.06] rounded animate-pulse mb-2" />
+                      <div className="h-2.5 w-1/3 bg-black/[0.04] rounded animate-pulse" />
+                    </div>
+                  ))}
+                </div>
+              ) : news.map((article, i) => (
+                <a key={article.id} href={article.url} target="_blank" rel="noopener noreferrer"
+                  className={`block py-3 hover:bg-black/[0.03] -mx-4 px-4 transition-colors ${i < 2 ? 'border-b border-border-color/50' : ''}`}>
+                  <p className="text-sm text-text-primary font-medium leading-snug line-clamp-2 hover:text-accent transition-colors">
                     {article.title}
                   </p>
                   <p className="text-[11px] text-text-disabled mt-1">
                     {article.source} · {new Date(article.publishedAt).toLocaleDateString('ko-KR')}
                   </p>
-                </div>
+                </a>
               ))}
             </CardContent>
           </Card>
