@@ -33,7 +33,7 @@ export default function QueryInput() {
         value={question}
         onChange={(e) => setQuestion(e.target.value)}
         placeholder="Ask a legal question, e.g. 'Do I need to file FBAR if I have accounts in Korea?'"
-        className="min-h-28 bg-bg-card border-white/10 text-white placeholder:text-white/30 focus:border-accent"
+        className="min-h-28 bg-bg-card border-border-color text-text-primary placeholder:text-text-disabled focus:border-accent"
       />
       <Button onClick={ask} disabled={loading || !question.trim()} className="bg-accent hover:bg-accent/80 text-white">
         {loading ? 'Researching...' : 'Get Legal Answer'}

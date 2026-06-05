@@ -78,17 +78,17 @@ export default function SettingsPage() {
       <div className="flex-1 overflow-y-auto p-5 space-y-4 max-w-2xl">
 
         {/* 뉴스 관심 태그 */}
-        <Card className="bg-bg-card border-white/10">
+        <Card className="bg-bg-card border-border-color">
           <CardHeader className="pb-3 flex flex-row items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-accent/15 flex items-center justify-center">
               <Tag size={14} className="text-accent" />
             </div>
             <div>
-              <CardTitle className="text-sm font-semibold text-white">뉴스 관심 태그</CardTitle>
-              <p className="text-xs text-white/40">선택한 태그의 뉴스만 피드에 표시됩니다</p>
+              <CardTitle className="text-sm font-semibold text-text-primary">뉴스 관심 태그</CardTitle>
+              <p className="text-xs text-text-secondary">선택한 태그의 뉴스만 피드에 표시됩니다</p>
             </div>
           </CardHeader>
-          <Separator className="bg-white/10 mb-3" />
+          <Separator className="bg-border-color mb-3" />
           <CardContent className="space-y-3">
             <div className="flex flex-wrap gap-2">
               {NEWS_TAGS.filter((t) => t !== '전체').map((tag) => {
@@ -100,7 +100,7 @@ export default function SettingsPage() {
                     className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
                       active
                         ? 'bg-accent/20 text-accent border-accent/40'
-                        : 'bg-white/5 text-white/40 border-white/10 hover:border-white/30'
+                        : 'bg-black/[0.04] text-text-secondary border-border-color hover:border-border-color'
                     }`}
                   >
                     {tag}
@@ -109,22 +109,22 @@ export default function SettingsPage() {
                 )
               })}
             </div>
-            <p className="text-[11px] text-white/30">{settings.newsTags.length}개 태그 선택됨</p>
+            <p className="text-[11px] text-text-disabled">{settings.newsTags.length}개 태그 선택됨</p>
           </CardContent>
         </Card>
 
         {/* Red Flag 키워드 사전 */}
-        <Card className="bg-bg-card border-white/10">
+        <Card className="bg-bg-card border-border-color">
           <CardHeader className="pb-3 flex flex-row items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-risk-red/15 flex items-center justify-center">
               <AlertTriangle size={14} className="text-risk-red" />
             </div>
             <div>
-              <CardTitle className="text-sm font-semibold text-white">Red Flag 키워드 사전</CardTitle>
-              <p className="text-xs text-white/40">Clause Finder 스크리닝에 사용되는 키워드 목록</p>
+              <CardTitle className="text-sm font-semibold text-text-primary">Red Flag 키워드 사전</CardTitle>
+              <p className="text-xs text-text-secondary">Clause Finder 스크리닝에 사용되는 키워드 목록</p>
             </div>
           </CardHeader>
-          <Separator className="bg-white/10 mb-3" />
+          <Separator className="bg-border-color mb-3" />
           <CardContent className="space-y-4">
             {/* 기본 키워드 */}
             <div className="space-y-2">
@@ -153,14 +153,14 @@ export default function SettingsPage() {
             {/* 사용자 추가 키워드 */}
             {settings.customKeywords.length > 0 && (
               <div className="space-y-2">
-                <p className="text-xs font-semibold text-white/60">사용자 추가 키워드</p>
+                <p className="text-xs font-semibold text-text-secondary">사용자 추가 키워드</p>
                 <div className="space-y-1.5">
                   {settings.customKeywords.map((entry, i) => (
-                    <div key={i} className="flex items-center gap-2 p-2 rounded-lg bg-white/5">
+                    <div key={i} className="flex items-center gap-2 p-2 rounded-lg bg-black/[0.04]">
                       <span className={`w-2 h-2 rounded-full flex-shrink-0 ${entry.level === 'red' ? 'bg-risk-red' : 'bg-risk-orange'}`} />
-                      <span className="text-xs text-white font-medium flex-1">{entry.keyword}</span>
-                      {entry.description && <span className="text-[11px] text-white/40 flex-1">{entry.description}</span>}
-                      <button onClick={() => removeKeyword(i)} className="text-white/30 hover:text-white/70 transition-colors">
+                      <span className="text-xs text-text-primary font-medium flex-1">{entry.keyword}</span>
+                      {entry.description && <span className="text-[11px] text-text-secondary flex-1">{entry.description}</span>}
+                      <button onClick={() => removeKeyword(i)} className="text-text-disabled hover:text-text-secondary transition-colors">
                         <X size={12} />
                       </button>
                     </div>
@@ -171,19 +171,19 @@ export default function SettingsPage() {
 
             {/* 키워드 추가 폼 */}
             <div className="space-y-2 pt-1">
-              <p className="text-xs text-white/40">새 키워드 추가</p>
+              <p className="text-xs text-text-secondary">새 키워드 추가</p>
               <div className="flex gap-2">
                 <Input
                   value={newKeyword}
                   onChange={(e) => setNewKeyword(e.target.value)}
                   placeholder="키워드"
-                  className="bg-white/5 border-white/10 text-white text-xs h-8"
+                  className="bg-black/[0.04] border-border-color text-text-primary text-xs h-8"
                   onKeyDown={(e) => e.key === 'Enter' && addKeyword()}
                 />
                 <select
                   value={newKeywordLevel}
                   onChange={(e) => setNewKeywordLevel(e.target.value as 'red' | 'orange')}
-                  className="bg-white/5 border border-white/10 text-white text-xs rounded-md px-2 h-8"
+                  className="bg-black/[0.04] border border-border-color text-text-primary text-xs rounded-md px-2 h-8"
                 >
                   <option value="red">RED</option>
                   <option value="orange">ORANGE</option>
@@ -193,7 +193,7 @@ export default function SettingsPage() {
                 value={newKeywordDesc}
                 onChange={(e) => setNewKeywordDesc(e.target.value)}
                 placeholder="설명 (선택)"
-                className="bg-white/5 border-white/10 text-white text-xs h-8"
+                className="bg-black/[0.04] border-border-color text-text-primary text-xs h-8"
               />
               <Button
                 size="sm"
@@ -209,17 +209,17 @@ export default function SettingsPage() {
         </Card>
 
         {/* 알림 설정 */}
-        <Card className="bg-bg-card border-white/10">
+        <Card className="bg-bg-card border-border-color">
           <CardHeader className="pb-3 flex flex-row items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-purple-400/15 flex items-center justify-center">
               <Bell size={14} className="text-purple-400" />
             </div>
             <div>
-              <CardTitle className="text-sm font-semibold text-white">알림 설정</CardTitle>
-              <p className="text-xs text-white/40">수신할 알림 유형을 선택하세요</p>
+              <CardTitle className="text-sm font-semibold text-text-primary">알림 설정</CardTitle>
+              <p className="text-xs text-text-secondary">수신할 알림 유형을 선택하세요</p>
             </div>
           </CardHeader>
-          <Separator className="bg-white/10 mb-3" />
+          <Separator className="bg-border-color mb-3" />
           <CardContent className="space-y-0">
             {([
               { key: 'newsRefresh' as const, label: '새 기사 알림', desc: '관심 태그에 새 기사가 등록되면 알림을 받습니다' },
@@ -229,8 +229,8 @@ export default function SettingsPage() {
               <div key={key}>
                 <div className="flex items-center justify-between py-3">
                   <div>
-                    <p className="text-sm text-white font-medium">{label}</p>
-                    <p className="text-xs text-white/40 mt-0.5">{desc}</p>
+                    <p className="text-sm text-text-primary font-medium">{label}</p>
+                    <p className="text-xs text-text-secondary mt-0.5">{desc}</p>
                   </div>
                   <Switch
                     checked={settings.notifications[key]}
@@ -238,7 +238,7 @@ export default function SettingsPage() {
                     className="data-[state=checked]:bg-accent"
                   />
                 </div>
-                {i < arr.length - 1 && <Separator className="bg-white/5" />}
+                {i < arr.length - 1 && <Separator className="bg-border-color/50" />}
               </div>
             ))}
           </CardContent>

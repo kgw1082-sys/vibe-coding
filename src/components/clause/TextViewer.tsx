@@ -41,13 +41,13 @@ function buildHighlightedHtml(
 export default function TextViewer({ text, highlights = [] }: TextViewerProps) {
   if (!text) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-56 text-center gap-3 bg-bg-card rounded-xl border border-white/10 p-6">
-        <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center">
-          <Upload size={22} className="text-white/20" />
+      <div className="flex flex-col items-center justify-center min-h-56 text-center gap-3 bg-bg-card rounded-xl border border-border-color p-6">
+        <div className="w-12 h-12 rounded-xl bg-black/[0.04] flex items-center justify-center">
+          <Upload size={22} className="text-text-disabled" />
         </div>
         <div>
-          <p className="text-sm text-white/40 font-medium">분석할 특약이 없습니다</p>
-          <p className="text-xs text-white/25 mt-1">
+          <p className="text-sm text-text-secondary font-medium">분석할 특약이 없습니다</p>
+          <p className="text-xs text-text-disabled mt-1">
             텍스트를 입력하거나 PDF / DOCX 파일을 업로드하면<br />
             원문이 이곳에 하이라이트와 함께 표시됩니다
           </p>
@@ -63,7 +63,7 @@ export default function TextViewer({ text, highlights = [] }: TextViewerProps) {
 
   return (
     <pre
-      className="text-sm text-white/70 whitespace-pre-wrap bg-bg-card rounded-xl border border-white/10 p-5 leading-relaxed overflow-y-auto max-h-[480px]"
+      className="text-sm text-text-secondary whitespace-pre-wrap bg-bg-card rounded-xl border border-border-color p-5 leading-relaxed overflow-y-auto max-h-[480px]"
       dangerouslySetInnerHTML={{ __html: html }}
     />
   )

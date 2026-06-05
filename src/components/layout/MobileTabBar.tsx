@@ -16,7 +16,7 @@ export default function MobileTabBar() {
   const pathname = usePathname()
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 flex md:hidden bg-bg-surface border-t border-white/10 safe-area-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 flex md:hidden bg-bg-surface border-t border-border-color safe-area-bottom">
       {navItems.map(({ href, label, icon: Icon }) => {
         const active = pathname === href
         return (
@@ -24,7 +24,7 @@ export default function MobileTabBar() {
             key={href}
             href={href}
             className={`flex-1 flex flex-col items-center justify-center py-2 gap-0.5 transition-colors ${
-              active ? 'text-accent' : 'text-white/40'
+              active ? 'text-accent' : 'text-text-secondary'
             }`}
           >
             <Icon size={20} />

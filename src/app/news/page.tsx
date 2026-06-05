@@ -17,24 +17,24 @@ import type { NewsArticle, NewsResponse } from '@/types'
 // ── 스켈레톤 카드 ───────────────────────────────────────────────────────
 function NewsCardSkeleton() {
   return (
-    <Card className="bg-bg-card border-white/10">
+    <Card className="bg-bg-card border-border-color">
       <CardContent className="pt-4 pb-4 space-y-3">
         <div className="flex gap-1.5">
-          <Skeleton className="h-5 w-20 rounded-full bg-white/10" />
-          <Skeleton className="h-5 w-16 rounded-full bg-white/10" />
+          <Skeleton className="h-5 w-20 rounded-full bg-black/[0.08]" />
+          <Skeleton className="h-5 w-16 rounded-full bg-black/[0.08]" />
         </div>
         <div className="space-y-1.5">
-          <Skeleton className="h-4 w-full bg-white/10" />
-          <Skeleton className="h-4 w-4/5 bg-white/10" />
+          <Skeleton className="h-4 w-full bg-black/[0.08]" />
+          <Skeleton className="h-4 w-4/5 bg-black/[0.08]" />
         </div>
-        <Skeleton className="h-3 w-28 bg-white/10" />
-        <div className="border-t border-white/5 pt-3 space-y-1.5">
+        <Skeleton className="h-3 w-28 bg-black/[0.08]" />
+        <div className="border-t border-border-color/50 pt-3 space-y-1.5">
           <div className="flex items-center gap-1.5 mb-1">
             <Skeleton className="h-3 w-3 rounded-full bg-accent/20" />
-            <Skeleton className="h-3 w-16 bg-white/10" />
+            <Skeleton className="h-3 w-16 bg-black/[0.08]" />
           </div>
-          <Skeleton className="h-3 w-full bg-white/10" />
-          <Skeleton className="h-3 w-3/4 bg-white/10" />
+          <Skeleton className="h-3 w-full bg-black/[0.08]" />
+          <Skeleton className="h-3 w-3/4 bg-black/[0.08]" />
         </div>
       </CardContent>
     </Card>
@@ -71,7 +71,7 @@ function NewsCard({ article }: { article: NewsArticle }) {
 
   return (
     <Card
-      className="bg-bg-card border-white/10 hover:border-accent/30 transition-all cursor-pointer group"
+      className="bg-bg-card border-border-color hover:border-accent/30 transition-all cursor-pointer group"
       onClick={() => window.open(article.url, '_blank', 'noopener')}
     >
       <CardContent className="pt-4 pb-4 space-y-2">
@@ -85,42 +85,42 @@ function NewsCard({ article }: { article: NewsArticle }) {
         )}
 
         {/* 제목 */}
-        <p className="text-sm font-medium text-white leading-snug line-clamp-2 group-hover:text-accent transition-colors">
+        <p className="text-sm font-medium text-text-primary leading-snug line-clamp-2 group-hover:text-accent transition-colors">
           {article.title}
         </p>
 
         {/* 설명 */}
         {article.description && (
-          <p className="text-xs text-white/45 leading-relaxed line-clamp-2">{article.description}</p>
+          <p className="text-xs text-text-muted leading-relaxed line-clamp-2">{article.description}</p>
         )}
 
         {/* 출처 · 날짜 · 액션 */}
         <div className="flex items-center justify-between">
-          <p className="text-[10px] text-white/30">
+          <p className="text-[10px] text-text-disabled">
             {article.source} · {formattedDate}
           </p>
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={toggleBookmark}
-              className="p-1 rounded text-white/30 hover:text-accent transition-colors"
+              className="p-1 rounded text-text-disabled hover:text-accent transition-colors"
               title={bookmarked ? '북마크 제거' : '북마크'}
             >
               {bookmarked
                 ? <BookmarkCheck size={13} className="text-accent" />
                 : <Bookmark size={13} />}
             </button>
-            <ExternalLink size={11} className="text-white/20" />
+            <ExternalLink size={11} className="text-text-disabled" />
           </div>
         </div>
 
         {/* AI 인사이트 */}
         {article.insight && (
-          <div className="border-t border-white/5 pt-2.5">
+          <div className="border-t border-border-color/50 pt-2.5">
             <div className="flex items-center gap-1.5 mb-1">
               <Sparkles size={11} className="text-accent" />
               <span className="text-[10px] font-semibold text-accent">AI 인사이트</span>
             </div>
-            <p className="text-[11px] text-white/55 leading-relaxed">{article.insight}</p>
+            <p className="text-[11px] text-text-secondary leading-relaxed">{article.insight}</p>
           </div>
         )}
       </CardContent>
@@ -134,12 +134,12 @@ function AddTagModal({ onAdd, onClose }: { onAdd: (tag: string) => void; onClose
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={onClose}>
       <div
-        className="bg-bg-card border border-white/15 rounded-xl p-5 w-full max-w-xs space-y-3"
+        className="bg-bg-card border border-border-color rounded-xl p-5 w-full max-w-xs space-y-3"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
-          <p className="text-sm font-semibold text-white">태그 추가</p>
-          <button onClick={onClose}><X size={16} className="text-white/40 hover:text-white" /></button>
+          <p className="text-sm font-semibold text-text-primary">태그 추가</p>
+          <button onClick={onClose}><X size={16} className="text-text-disabled hover:text-text-primary" /></button>
         </div>
         <Input
           autoFocus
@@ -147,11 +147,11 @@ function AddTagModal({ onAdd, onClose }: { onAdd: (tag: string) => void; onClose
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter' && value.trim()) { onAdd(value.trim()); onClose() } }}
           placeholder="새 태그 이름 (예: Flood)"
-          className="bg-bg-surface border-white/10 text-white placeholder:text-white/25 focus-visible:ring-accent/50"
+          className="bg-bg-surface border-border-color text-text-primary placeholder:text-text-disabled focus-visible:ring-accent/50"
         />
         <div className="flex gap-2">
           <Button
-            size="sm" variant="ghost" className="flex-1 text-white/50"
+            size="sm" variant="ghost" className="flex-1 text-text-secondary"
             onClick={onClose}
           >취소</Button>
           <Button
@@ -239,7 +239,7 @@ export default function NewsPage() {
         actions={
           <Button
             size="sm" variant="ghost"
-            className="text-white/50 hover:text-white gap-1.5"
+            className="text-text-secondary hover:text-text-primary gap-1.5"
             onClick={() => fetchArticles(selectedTag, sortBy)}
             disabled={loading}
           >
@@ -259,7 +259,7 @@ export default function NewsPage() {
               className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
                 selectedTag === tag
                   ? 'bg-accent text-white border-accent'
-                  : 'bg-bg-card text-white/50 border-white/10 hover:border-white/30 hover:text-white'
+                  : 'bg-bg-card text-text-secondary border-border-color hover:border-border-color hover:text-text-primary'
               }`}
             >
               {tag}
@@ -267,7 +267,7 @@ export default function NewsPage() {
           ))}
           <button
             onClick={() => setShowAddModal(true)}
-            className="px-2.5 py-1 rounded-full text-xs font-medium border border-dashed border-white/20 text-white/30 hover:border-accent/50 hover:text-accent transition-colors flex items-center gap-1"
+            className="px-2.5 py-1 rounded-full text-xs font-medium border border-dashed border-border-color text-text-disabled hover:border-accent/50 hover:text-accent transition-colors flex items-center gap-1"
           >
             <Plus size={11} />
             태그 추가
@@ -276,26 +276,26 @@ export default function NewsPage() {
 
         {/* ── 정렬 툴바 ────────────────────────────────────────── */}
         <div className="flex items-center justify-between">
-          <p className="text-xs text-white/40">
+          <p className="text-xs text-text-secondary">
             {loading ? (
-              <span className="text-white/25">불러오는 중...</span>
+              <span className="text-text-disabled">불러오는 중...</span>
             ) : (
               <>
-                <span className="text-white font-medium">{articles.length}</span>개 기사
+                <span className="text-text-primary font-medium">{articles.length}</span>개 기사
                 {selectedTag !== '전체' && (
                   <span className="ml-1 text-accent">· {selectedTag}</span>
                 )}
                 {formattedCachedAt && (
-                  <span className="ml-1.5 text-white/20">(업데이트: {formattedCachedAt})</span>
+                  <span className="ml-1.5 text-text-disabled">(업데이트: {formattedCachedAt})</span>
                 )}
               </>
             )}
           </p>
           <Select value={sortBy} onValueChange={(v) => v !== null && setSortBy(v as 'publishedAt' | 'relevancy')}>
-            <SelectTrigger className="w-32 h-8 text-xs bg-bg-card border-white/10 text-white">
+            <SelectTrigger className="w-32 h-8 text-xs bg-bg-card border-border-color text-text-primary">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-bg-card border-white/10 text-white">
+            <SelectContent className="bg-bg-card border-border-color text-text-primary">
               <SelectItem value="publishedAt" className="text-xs">최신순</SelectItem>
               <SelectItem value="relevancy"   className="text-xs">관련도순</SelectItem>
             </SelectContent>
@@ -331,10 +331,10 @@ export default function NewsPage() {
         {/* ── 빈 상태 ──────────────────────────────────────────── */}
         {!loading && !error && articles.length === 0 && (
           <div className="text-center py-16">
-            <p className="text-sm text-white/40">해당 태그의 뉴스가 없습니다.</p>
+            <p className="text-sm text-text-secondary">해당 태그의 뉴스가 없습니다.</p>
             <Button
               size="sm" variant="ghost"
-              className="mt-3 text-white/40 hover:text-white"
+              className="mt-3 text-text-secondary hover:text-text-primary"
               onClick={() => handleTagChange('전체')}
             >
               전체 보기

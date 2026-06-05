@@ -14,8 +14,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko" className="dark">
-      <body className={`${inter.className} bg-bg-base text-white antialiased`}>
+    <html lang="ko">
+      <body className={`${inter.className} bg-bg-base text-text-primary antialiased`}>
         <div className="flex h-screen overflow-hidden">
           <Sidebar />
           <main className="flex-1 flex flex-col overflow-hidden pb-16 md:pb-0">
@@ -24,10 +24,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </div>
         <MobileTabBar />
         <Toaster
-          theme="dark"
+          theme="light"
           position="top-right"
           toastOptions={{
-            style: { background: '#21253a', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' },
+            style: { background: '#EDE6DD', border: '1px solid #E9D5CD', color: '#2D2420' },
           }}
         />
       </body>

@@ -50,7 +50,7 @@ export default function DashboardPage() {
         title="대시보드"
         description="US Expat Insurance Intelligence"
         actions={
-          <Button size="sm" variant="ghost" className="text-white/50 hover:text-white gap-1.5">
+          <Button size="sm" variant="ghost" className="text-text-muted hover:text-text-primary gap-1.5">
             <RefreshCw size={14} />
             새로고침
           </Button>
@@ -61,13 +61,13 @@ export default function DashboardPage() {
         {/* 통계 카드 4개 */}
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
           {STAT_CARDS.map(({ label, value, sub, icon: Icon, color, bg }) => (
-            <Card key={label} className="bg-bg-card border-white/10">
+            <Card key={label} className="bg-bg-card border-border-color">
               <CardContent className="pt-4 pb-4">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-xs text-white/50 mb-1">{label}</p>
-                    <p className="text-2xl font-bold text-white">{value}</p>
-                    <p className="text-[11px] text-white/30 mt-0.5">{sub}</p>
+                    <p className="text-xs text-text-muted mb-1">{label}</p>
+                    <p className="text-2xl font-bold text-text-primary">{value}</p>
+                    <p className="text-[11px] text-text-disabled mt-0.5">{sub}</p>
                   </div>
                   <div className={`w-9 h-9 rounded-lg ${bg} flex items-center justify-center`}>
                     <Icon size={18} className={color} />
@@ -80,17 +80,17 @@ export default function DashboardPage() {
 
         {/* 빠른 접근 카드 3개 */}
         <div>
-          <p className="text-xs font-semibold text-white/30 uppercase tracking-widest mb-3">빠른 접근</p>
+          <p className="text-xs font-semibold text-text-disabled uppercase tracking-widest mb-3">빠른 접근</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {QUICK_ACCESS.map(({ href, icon: Icon, color, bg, title, description, cta }) => (
               <Link key={href} href={href}>
-                <Card className="bg-bg-card border-white/10 hover:border-accent/30 hover:bg-bg-card/80 transition-all cursor-pointer h-full">
+                <Card className="bg-bg-card border-border-color hover:border-accent/30 hover:bg-bg-card/80 transition-all cursor-pointer h-full">
                   <CardContent className="pt-5 pb-5">
                     <div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center mb-3`}>
                       <Icon size={20} className={color} />
                     </div>
-                    <h3 className="text-sm font-semibold text-white mb-1">{title}</h3>
-                    <p className="text-xs text-white/50 leading-relaxed mb-3">{description}</p>
+                    <h3 className="text-sm font-semibold text-text-primary mb-1">{title}</h3>
+                    <p className="text-xs text-text-secondary leading-relaxed mb-3">{description}</p>
                     <span className={`text-xs font-medium ${color} flex items-center gap-1`}>
                       {cta} <ChevronRight size={12} />
                     </span>
@@ -104,21 +104,21 @@ export default function DashboardPage() {
         {/* 하단 2열 패널 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           {/* 최근 뉴스 */}
-          <Card className="bg-bg-card border-white/10">
+          <Card className="bg-bg-card border-border-color">
             <CardHeader className="pb-2 flex flex-row items-center justify-between">
-              <CardTitle className="text-xs font-semibold text-white/50 uppercase tracking-widest">최근 뉴스</CardTitle>
+              <CardTitle className="text-xs font-semibold text-text-secondary uppercase tracking-widest">최근 뉴스</CardTitle>
               <Link href="/news" className="text-xs text-accent hover:underline flex items-center gap-0.5">
                 전체 보기 <ChevronRight size={11} />
               </Link>
             </CardHeader>
             <CardContent className="space-y-0 pt-0">
               {MOCK_RECENT_NEWS.map((article, i) => (
-                <div key={article.id} className={`py-3 ${i < MOCK_RECENT_NEWS.length - 1 ? 'border-b border-white/5' : ''}`}>
+                <div key={article.id} className={`py-3 ${i < MOCK_RECENT_NEWS.length - 1 ? 'border-b border-border-color/50' : ''}`}>
                   <div className="flex items-start gap-2">
                     <TrendingUp size={13} className="text-accent flex-shrink-0 mt-0.5" />
                     <div className="min-w-0">
-                      <p className="text-xs text-white font-medium line-clamp-2 leading-snug">{article.title}</p>
-                      <p className="text-[10px] text-white/30 mt-1">
+                      <p className="text-xs text-text-primary font-medium line-clamp-2 leading-snug">{article.title}</p>
+                      <p className="text-[10px] text-text-disabled mt-1">
                         {article.source} · {new Date(article.publishedAt).toLocaleDateString('ko-KR')}
                       </p>
                     </div>
@@ -129,16 +129,16 @@ export default function DashboardPage() {
           </Card>
 
           {/* 최근 Flag 목록 */}
-          <Card className="bg-bg-card border-white/10">
+          <Card className="bg-bg-card border-border-color">
             <CardHeader className="pb-2 flex flex-row items-center justify-between">
-              <CardTitle className="text-xs font-semibold text-white/50 uppercase tracking-widest">최근 Flag</CardTitle>
+              <CardTitle className="text-xs font-semibold text-text-secondary uppercase tracking-widest">최근 Flag</CardTitle>
               <Link href="/clause" className="text-xs text-accent hover:underline flex items-center gap-0.5">
                 전체 보기 <ChevronRight size={11} />
               </Link>
             </CardHeader>
             <CardContent className="space-y-0 pt-0">
               {MOCK_RECENT_FLAGS.map((flag, i) => (
-                <div key={i} className={`py-3 ${i < MOCK_RECENT_FLAGS.length - 1 ? 'border-b border-white/5' : ''}`}>
+                <div key={i} className={`py-3 ${i < MOCK_RECENT_FLAGS.length - 1 ? 'border-b border-border-color/50' : ''}`}>
                   <div className="flex items-start gap-2">
                     {flag.level === 'RED'
                       ? <AlertTriangle size={13} className="text-risk-red flex-shrink-0 mt-0.5" />
@@ -146,12 +146,12 @@ export default function DashboardPage() {
                     }
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5 mb-0.5">
-                        <span className="text-xs text-white font-medium">{flag.keyword}</span>
+                        <span className="text-xs text-text-primary font-medium">{flag.keyword}</span>
                         <Badge className={`text-[10px] px-1 py-0 border-0 ${flag.level === 'RED' ? 'bg-risk-red/20 text-risk-red' : 'bg-risk-orange/20 text-risk-orange'}`}>
                           {flag.level}
                         </Badge>
                       </div>
-                      <p className="text-[10px] text-white/30 truncate">{flag.clauseTitle}</p>
+                      <p className="text-[10px] text-text-disabled truncate">{flag.clauseTitle}</p>
                     </div>
                   </div>
                 </div>

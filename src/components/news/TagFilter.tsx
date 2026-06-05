@@ -25,7 +25,7 @@ export default function TagFilter({ selected, onChange }: TagFilterProps) {
           className={`cursor-pointer border text-xs transition-colors ${
             selected.includes(tag)
               ? 'bg-accent/20 text-accent border-accent/40'
-              : 'bg-white/5 text-white/50 border-white/10 hover:border-white/30'
+              : 'bg-black/[0.04] text-text-secondary border-border-color hover:border-border-color'
           }`}
         >
           {tag}

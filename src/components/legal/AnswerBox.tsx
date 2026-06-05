@@ -14,20 +14,20 @@ const confidenceColor: Record<string, string> = {
 
 export default function AnswerBox({ answer }: AnswerBoxProps) {
   return (
-    <Card className="bg-bg-card border-white/10">
+    <Card className="bg-bg-card border-border-color">
       <CardHeader className="pb-2 flex flex-row items-start justify-between gap-2">
-        <CardTitle className="text-sm text-white/60 font-normal">{answer.question}</CardTitle>
+        <CardTitle className="text-sm text-text-secondary font-normal">{answer.question}</CardTitle>
         <Badge className={`text-xs border-0 flex-shrink-0 ${confidenceColor[answer.confidence]}`}>
           {answer.confidence}
         </Badge>
       </CardHeader>
       <CardContent className="space-y-3">
-        <p className="text-sm text-white leading-relaxed">{answer.answer}</p>
+        <p className="text-sm text-text-primary leading-relaxed">{answer.answer}</p>
         {answer.sources.length > 0 && (
-          <div className="space-y-1 pt-2 border-t border-white/10">
-            <p className="text-xs text-white/40 font-medium">Sources</p>
+          <div className="space-y-1 pt-2 border-t border-border-color">
+            <p className="text-xs text-text-secondary font-medium">Sources</p>
             {answer.sources.map((src, i) => (
-              <div key={i} className="text-xs text-white/50">
+              <div key={i} className="text-xs text-text-secondary">
                 <span className="text-accent">{src.title}</span>
                 {src.excerpt && <span className="ml-1">— {src.excerpt}</span>}
               </div>

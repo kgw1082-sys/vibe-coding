@@ -24,7 +24,7 @@ const VERDICT_CONFIG = {
   violation: { label: '위반 가능성', icon: XCircle,      color: 'text-risk-red',    bg: 'bg-risk-red/15 border-risk-red/30' },
   caution:   { label: '주의 필요',   icon: AlertTriangle, color: 'text-risk-orange', bg: 'bg-risk-orange/15 border-risk-orange/30' },
   ok:        { label: '문제없음',    icon: CheckCircle2,  color: 'text-emerald-400', bg: 'bg-emerald-400/15 border-emerald-400/30' },
-  unknown:   { label: '판단 불가',   icon: HelpCircle,    color: 'text-white/40',    bg: 'bg-white/5 border-white/10' },
+  unknown:   { label: '판단 불가',   icon: HelpCircle,    color: 'text-text-disabled', bg: 'bg-black/[0.04] border-border-color' },
 }
 
 function VerdictBadge({ verdict }: { verdict: LegalQueryResult['verdict'] }) {
@@ -43,18 +43,18 @@ function AnswerSkeleton() {
   return (
     <div className="space-y-3 p-4">
       <div className="flex items-center gap-2">
-        <Skeleton className="h-5 w-20 rounded-lg bg-white/10" />
-        <Skeleton className="h-4 w-16 rounded-full bg-white/10" />
+        <Skeleton className="h-5 w-20 rounded-lg bg-black/[0.08]" />
+        <Skeleton className="h-4 w-16 rounded-full bg-black/[0.08]" />
       </div>
-      <Skeleton className="h-4 w-full bg-white/10" />
-      <Skeleton className="h-4 w-5/6 bg-white/10" />
-      <Skeleton className="h-4 w-4/5 bg-white/10" />
-      <Separator className="bg-white/10 my-2" />
-      <p className="text-[10px] text-white/30 uppercase tracking-widest font-semibold">관련 법령</p>
+      <Skeleton className="h-4 w-full bg-black/[0.08]" />
+      <Skeleton className="h-4 w-5/6 bg-black/[0.08]" />
+      <Skeleton className="h-4 w-4/5 bg-black/[0.08]" />
+      <Separator className="bg-border-color my-2" />
+      <p className="text-[10px] text-text-disabled uppercase tracking-widest font-semibold">관련 법령</p>
       {[1, 2].map((i) => (
-        <div key={i} className="p-2.5 rounded-lg bg-white/5 space-y-1.5">
-          <Skeleton className="h-3.5 w-32 bg-white/10" />
-          <Skeleton className="h-3 w-full bg-white/10" />
+        <div key={i} className="p-2.5 rounded-lg bg-black/[0.04] space-y-1.5">
+          <Skeleton className="h-3.5 w-32 bg-black/[0.08]" />
+          <Skeleton className="h-3 w-full bg-black/[0.08]" />
         </div>
       ))}
     </div>
@@ -66,17 +66,17 @@ function SearchSkeleton() {
   return (
     <>
       {[1, 2, 3].map((i) => (
-        <Card key={i} className="bg-bg-card border-white/10">
+        <Card key={i} className="bg-bg-card border-border-color">
           <CardContent className="pt-4 pb-4 space-y-2">
             <div className="flex justify-between">
-              <Skeleton className="h-4 w-40 bg-white/10" />
-              <Skeleton className="h-5 w-20 rounded-full bg-white/10" />
+              <Skeleton className="h-4 w-40 bg-black/[0.08]" />
+              <Skeleton className="h-5 w-20 rounded-full bg-black/[0.08]" />
             </div>
-            <Skeleton className="h-3 w-full bg-white/10" />
-            <Skeleton className="h-3 w-4/5 bg-white/10" />
+            <Skeleton className="h-3 w-full bg-black/[0.08]" />
+            <Skeleton className="h-3 w-4/5 bg-black/[0.08]" />
             <div className="flex items-center gap-2 pt-1">
-              <Skeleton className="h-1.5 flex-1 rounded-full bg-white/10" />
-              <Skeleton className="h-3 w-16 bg-white/10" />
+              <Skeleton className="h-1.5 flex-1 rounded-full bg-black/[0.08]" />
+              <Skeleton className="h-3 w-16 bg-black/[0.08]" />
             </div>
           </CardContent>
         </Card>
@@ -103,30 +103,30 @@ function LawChip({ law }: { law: { name: string; citation: string; url?: string;
 // ── 법령 검색 결과 카드 ────────────────────────────────────────────────
 function LawResultCard({ result }: { result: LawSearchResult }) {
   return (
-    <Card className="bg-bg-card border-white/10 hover:border-accent/30 transition-colors">
+    <Card className="bg-bg-card border-border-color hover:border-accent/30 transition-colors">
       <CardContent className="pt-4 pb-4">
         <div className="flex items-start justify-between gap-3 mb-2">
-          <h3 className="text-sm font-semibold text-white leading-snug">{result.lawName}</h3>
+          <h3 className="text-sm font-semibold text-text-primary leading-snug">{result.lawName}</h3>
           <Badge className="text-[10px] bg-accent/20 text-accent border-0 flex-shrink-0 whitespace-nowrap">
             {result.articleNumber}
           </Badge>
         </div>
-        <p className="text-xs text-white/60 leading-relaxed">{result.content}</p>
+        <p className="text-xs text-text-secondary leading-relaxed">{result.content}</p>
 
         <div className="flex items-center justify-between mt-3 gap-2">
           <div className="flex items-center gap-2 flex-1">
-            <div className="h-1 flex-1 bg-white/10 rounded-full overflow-hidden">
+            <div className="h-1 flex-1 bg-black/[0.06] rounded-full overflow-hidden">
               <div
                 className="h-full bg-accent rounded-full"
                 style={{ width: `${result.relevanceScore * 100}%` }}
               />
             </div>
-            <span className="text-[10px] text-white/30 flex-shrink-0">
+            <span className="text-[10px] text-text-disabled flex-shrink-0">
               {Math.round(result.relevanceScore * 100)}%
             </span>
           </div>
           {result.source && (
-            <span className="text-[10px] text-white/25 flex-shrink-0">{result.source}</span>
+            <span className="text-[10px] text-text-disabled flex-shrink-0">{result.source}</span>
           )}
           {result.url && (
             <a
@@ -138,7 +138,7 @@ function LawResultCard({ result }: { result: LawSearchResult }) {
           )}
         </div>
         {result.updatedAt && (
-          <p className="text-[10px] text-white/20 mt-1">최종 개정: {result.updatedAt}</p>
+          <p className="text-[10px] text-text-disabled mt-1">최종 개정: {result.updatedAt}</p>
         )}
       </CardContent>
     </Card>
@@ -210,17 +210,17 @@ export default function LegalPage() {
 
       <div className="flex-1 overflow-y-auto p-5">
         <Tabs defaultValue="nlq" className="!flex-col gap-4">
-          <TabsList className="bg-bg-card border border-white/10 p-1 h-auto">
+          <TabsList className="bg-bg-card border border-border-color p-1 h-auto">
             <TabsTrigger
               value="nlq"
-              className="text-xs data-[state=active]:bg-accent data-[state=active]:text-white text-white/50 gap-1.5 px-4 py-2"
+              className="text-xs data-[state=active]:bg-accent data-[state=active]:text-white text-text-secondary gap-1.5 px-4 py-2"
             >
               <MessageSquare size={13} />
               자연어 질의
             </TabsTrigger>
             <TabsTrigger
               value="search"
-              className="text-xs data-[state=active]:bg-accent data-[state=active]:text-white text-white/50 gap-1.5 px-4 py-2"
+              className="text-xs data-[state=active]:bg-accent data-[state=active]:text-white text-text-secondary gap-1.5 px-4 py-2"
             >
               <Search size={13} />
               법령 직접 검색
@@ -232,48 +232,48 @@ export default function LegalPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* 좌: 입력 */}
               <div className="space-y-3">
-                <Card className="bg-bg-card border-white/10">
+                <Card className="bg-bg-card border-border-color">
                   <CardContent className="pt-4 pb-4 space-y-3">
                     <div className="space-y-1.5">
-                      <label className="text-xs text-white/50 font-medium">주(State) 선택</label>
+                      <label className="text-xs text-text-secondary font-medium">주(State) 선택</label>
                       <Select value={state} onValueChange={setState}>
-                        <SelectTrigger className="bg-bg-surface border-white/10 text-white text-sm h-9">
+                        <SelectTrigger className="bg-bg-surface border-border-color text-text-primary text-sm h-9">
                           <SelectValue placeholder="주를 선택하세요 (선택 사항)" />
                         </SelectTrigger>
-                        <SelectContent className="bg-bg-card border-white/10 text-white max-h-60">
+                        <SelectContent className="bg-bg-card border-border-color text-text-primary max-h-60">
                           {US_STATES.map((s) => (
-                            <SelectItem key={s} value={s} className="text-sm focus:bg-accent/20 focus:text-white">{s}</SelectItem>
+                            <SelectItem key={s} value={s} className="text-sm focus:bg-accent/20 focus:text-text-primary">{s}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-xs text-white/50 font-medium">카테고리</label>
+                      <label className="text-xs text-text-secondary font-medium">카테고리</label>
                       <Select value={category} onValueChange={setCategory}>
-                        <SelectTrigger className="bg-bg-surface border-white/10 text-white text-sm h-9">
+                        <SelectTrigger className="bg-bg-surface border-border-color text-text-primary text-sm h-9">
                           <SelectValue placeholder="카테고리 선택 (선택 사항)" />
                         </SelectTrigger>
-                        <SelectContent className="bg-bg-card border-white/10 text-white">
+                        <SelectContent className="bg-bg-card border-border-color text-text-primary">
                           {LEGAL_CATEGORIES.map((c) => (
-                            <SelectItem key={c} value={c} className="text-sm focus:bg-accent/20 focus:text-white">{c}</SelectItem>
+                            <SelectItem key={c} value={c} className="text-sm focus:bg-accent/20 focus:text-text-primary">{c}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </div>
 
-                    <Separator className="bg-white/10" />
+                    <Separator className="bg-border-color" />
 
                     <div className="space-y-1.5">
-                      <label className="text-xs text-white/50 font-medium">질의 내용</label>
+                      <label className="text-xs text-text-secondary font-medium">질의 내용</label>
                       <Textarea
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         onKeyDown={(e) => { if (e.key === 'Enter' && e.ctrlKey) handleQuery() }}
                         placeholder="예: 캘리포니아 주에서 해외 거주자의 생명보험 계약 시 고지 의무 범위는?"
-                        className="min-h-28 bg-bg-surface border-white/10 text-white placeholder:text-white/25 focus-visible:ring-accent/50 resize-none text-sm"
+                        className="min-h-28 bg-bg-surface border-border-color text-text-primary placeholder:text-text-disabled focus-visible:ring-accent/50 resize-none text-sm"
                       />
-                      <p className="text-[10px] text-white/20">Ctrl+Enter로 바로 요청</p>
+                      <p className="text-[10px] text-text-disabled">Ctrl+Enter로 바로 요청</p>
                     </div>
 
                     <Button
@@ -291,22 +291,22 @@ export default function LegalPage() {
 
               {/* 우: 답변 */}
               <div className="space-y-3">
-                <Card className="bg-bg-card border-white/10">
+                <Card className="bg-bg-card border-border-color">
                   <CardHeader className="pb-2 flex flex-row items-center gap-2">
-                    <Scale size={14} className="text-white/40" />
-                    <CardTitle className="text-xs font-semibold text-white/50 uppercase tracking-widest">AI 법령 답변</CardTitle>
+                    <Scale size={14} className="text-text-disabled" />
+                    <CardTitle className="text-xs font-semibold text-text-secondary uppercase tracking-widest">AI 법령 답변</CardTitle>
                   </CardHeader>
                   <CardContent>
                     {queryLoading && <AnswerSkeleton />}
 
                     {!queryLoading && !queryResult && (
                       <div className="flex flex-col items-center justify-center min-h-52 text-center gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center">
-                          <MessageSquare size={22} className="text-white/20" />
+                        <div className="w-12 h-12 rounded-xl bg-black/[0.04] flex items-center justify-center">
+                          <MessageSquare size={22} className="text-text-disabled" />
                         </div>
                         <div>
-                          <p className="text-sm text-white/40 font-medium">아직 질의 내용이 없습니다</p>
-                          <p className="text-xs text-white/25 mt-1">
+                          <p className="text-sm text-text-secondary font-medium">아직 질의 내용이 없습니다</p>
+                          <p className="text-xs text-text-disabled mt-1">
                             주, 카테고리, 질의 내용을 입력하고<br />
                             법령 분석 요청 버튼을 클릭하세요
                           </p>
@@ -322,7 +322,7 @@ export default function LegalPage() {
                           <span className={`text-[10px] px-2 py-0.5 rounded font-medium ${
                             queryResult.confidence === 'HIGH'   ? 'bg-emerald-400/15 text-emerald-400' :
                             queryResult.confidence === 'MEDIUM' ? 'bg-risk-orange/15 text-risk-orange' :
-                                                                  'bg-white/10 text-white/30'
+                                                                  'bg-black/[0.06] text-text-disabled'
                           }`}>
                             신뢰도 {queryResult.confidence}
                           </span>
@@ -331,15 +331,15 @@ export default function LegalPage() {
                         {/* 답변 본문 */}
                         <div className="flex items-start gap-2">
                           <Sparkles size={13} className="text-accent flex-shrink-0 mt-0.5" />
-                          <p className="text-sm text-white/75 leading-relaxed">{queryResult.answer}</p>
+                          <p className="text-sm text-text-secondary leading-relaxed">{queryResult.answer}</p>
                         </div>
 
                         {/* 관련 법령 칩 */}
                         {queryResult.laws.length > 0 && (
                           <>
-                            <Separator className="bg-white/10" />
+                            <Separator className="bg-border-color" />
                             <div className="space-y-2">
-                              <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest">관련 법령</p>
+                              <p className="text-[10px] font-semibold text-text-disabled uppercase tracking-widest">관련 법령</p>
                               <div className="flex flex-wrap gap-2">
                                 {queryResult.laws.map((law, i) => (
                                   <LawChip key={i} law={law} />
@@ -348,9 +348,9 @@ export default function LegalPage() {
                               {/* 법령 스니펫 목록 */}
                               <div className="space-y-1.5 mt-2">
                                 {queryResult.laws.map((law, i) => (
-                                  <div key={i} className="px-3 py-2 rounded-lg bg-bg-surface border border-white/5">
+                                  <div key={i} className="px-3 py-2 rounded-lg bg-bg-surface border border-border-color/50">
                                     <p className="text-[10px] font-semibold text-accent mb-0.5">{law.citation || law.name}</p>
-                                    <p className="text-xs text-white/50 leading-relaxed">{law.snippet}</p>
+                                    <p className="text-xs text-text-secondary leading-relaxed">{law.snippet}</p>
                                   </div>
                                 ))}
                               </div>
@@ -379,21 +379,21 @@ export default function LegalPage() {
             {/* 검색 입력 */}
             <div className="flex gap-2">
               <div className="relative flex-1">
-                <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
+                <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-disabled" />
                 <Input
                   ref={searchInputRef}
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleSearch() }}
                   placeholder="법령명, 조문 번호, 키워드 (예: FBAR, IRC 911, workers comp)"
-                  className="pl-9 bg-bg-card border-white/10 text-white placeholder:text-white/25 focus-visible:ring-accent/50"
+                  className="pl-9 bg-bg-card border-border-color text-text-primary placeholder:text-text-disabled focus-visible:ring-accent/50"
                 />
               </div>
               <Select value={searchScope} onValueChange={(v) => v !== null && setSearchScope(v)}>
-                <SelectTrigger className="w-24 h-10 text-xs bg-bg-card border-white/10 text-white flex-shrink-0">
+                <SelectTrigger className="w-24 h-10 text-xs bg-bg-card border-border-color text-text-primary flex-shrink-0">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-bg-card border-white/10 text-white">
+                <SelectContent className="bg-bg-card border-border-color text-text-primary">
                   <SelectItem value="all"     className="text-xs">전체</SelectItem>
                   <SelectItem value="federal" className="text-xs">연방</SelectItem>
                   <SelectItem value="state"   className="text-xs">주법</SelectItem>
@@ -416,22 +416,22 @@ export default function LegalPage() {
               {searchLoading && <SearchSkeleton />}
 
               {!searchLoading && searchResults === null && (
-                <Card className="bg-bg-card border-white/10">
+                <Card className="bg-bg-card border-border-color">
                   <CardContent className="py-12 text-center">
-                    <Scale size={24} className="text-white/10 mx-auto mb-3" />
-                    <p className="text-sm text-white/30">검색어를 입력하고 검색 버튼을 클릭하세요</p>
-                    <p className="text-xs text-white/20 mt-1">연방법(Congress.gov, eCFR) 및 AI 보완 검색 지원</p>
+                    <Scale size={24} className="text-text-disabled mx-auto mb-3" />
+                    <p className="text-sm text-text-disabled">검색어를 입력하고 검색 버튼을 클릭하세요</p>
+                    <p className="text-xs text-text-disabled mt-1">연방법(Congress.gov, eCFR) 및 AI 보완 검색 지원</p>
                   </CardContent>
                 </Card>
               )}
 
               {!searchLoading && searchResults !== null && searchResults.length === 0 && (
-                <Card className="bg-bg-card border-white/10">
+                <Card className="bg-bg-card border-border-color">
                   <CardContent className="py-10 text-center">
-                    <p className="text-sm text-white/40">검색 결과가 없습니다.</p>
+                    <p className="text-sm text-text-secondary">검색 결과가 없습니다.</p>
                     <Button
                       size="sm" variant="ghost"
-                      className="mt-2 text-white/30 hover:text-white text-xs"
+                      className="mt-2 text-text-disabled hover:text-text-primary text-xs"
                       onClick={() => { setSearchInput(''); searchInputRef.current?.focus() }}
                     >
                       다시 검색
@@ -442,8 +442,8 @@ export default function LegalPage() {
 
               {!searchLoading && searchResults && searchResults.length > 0 && (
                 <>
-                  <p className="text-xs text-white/35">
-                    <span className="text-white font-medium">{searchResults.length}</span>건 검색됨
+                  <p className="text-xs text-text-muted">
+                    <span className="text-text-primary font-medium">{searchResults.length}</span>건 검색됨
                   </p>
                   {searchResults.map((result, i) => (
                     <LawResultCard key={i} result={result} />

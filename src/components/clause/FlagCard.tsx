@@ -20,18 +20,18 @@ export default function FlagCard({ flag }: FlagCardProps) {
         )}
         <div className="space-y-1.5 min-w-0 w-full">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-sm text-white">{flag.keyword}</span>
+            <span className="font-semibold text-sm text-text-primary">{flag.keyword}</span>
             <Badge className={`text-[10px] px-1.5 py-0 border-0 ${isRed ? 'bg-risk-red/20 text-risk-red' : 'bg-risk-orange/20 text-risk-orange'}`}>
               {flag.level}
             </Badge>
           </div>
-          <p className="text-xs text-white/50 break-words leading-relaxed">
+          <p className="text-xs text-text-secondary break-words leading-relaxed">
             &ldquo;{flag.context}&rdquo;
           </p>
           {flag.guidance && (
-            <div className="flex items-start gap-1.5 pt-1 border-t border-white/10">
+            <div className="flex items-start gap-1.5 pt-1 border-t border-border-color">
               <Lightbulb size={12} className="text-accent flex-shrink-0 mt-0.5" />
-              <p className="text-xs text-white/60 leading-relaxed">
+              <p className="text-xs text-text-secondary leading-relaxed">
                 <span className="font-medium text-accent">언더라이팅 가이던스: </span>
                 {flag.guidance}
               </p>

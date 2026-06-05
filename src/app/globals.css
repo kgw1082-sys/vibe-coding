@@ -4,56 +4,31 @@
 
 @layer base {
   :root {
-    --background: 222 31% 8%;
-    --foreground: 213 27% 84%;
-    --card: 228 22% 18%;
-    --card-foreground: 213 27% 84%;
-    --popover: 228 22% 18%;
-    --popover-foreground: 213 27% 84%;
-    --primary: 217 85% 63%;
-    --primary-foreground: 222 31% 8%;
-    --secondary: 226 20% 14%;
-    --secondary-foreground: 213 27% 84%;
-    --muted: 226 20% 14%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 217 85% 63%;
-    --accent-foreground: 222 31% 8%;
+    /* shadcn/ui vars — light warm theme */
+    --background: 33 47% 94%;        /* #F7F1E9 */
+    --foreground: 13 17% 15%;        /* #2D2420 */
+    --card: 30 24% 90%;              /* #EDE6DD */
+    --card-foreground: 13 17% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 13 17% 15%;
+    --primary: 27 89% 54%;           /* #F37321 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 30 24% 90%;
+    --secondary-foreground: 13 17% 15%;
+    --muted: 30 24% 90%;
+    --muted-foreground: 8 10% 45%;   /* #767171 */
+    --accent: 27 89% 54%;            /* #F37321 */
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 63% 60%;
-    --destructive-foreground: 213 27% 84%;
-    --border: 226 20% 24%;
-    --input: 226 20% 20%;
-    --ring: 217 85% 63%;
-    --radius: 0.5rem;
-
-    --background-hex: #0f1117;
-    --foreground-hex: #e2e8f0;
-  }
-
-  .dark {
-    --background: 222 31% 8%;
-    --foreground: 213 27% 84%;
-    --card: 228 22% 18%;
-    --card-foreground: 213 27% 84%;
-    --popover: 228 22% 18%;
-    --popover-foreground: 213 27% 84%;
-    --primary: 217 85% 63%;
-    --primary-foreground: 222 31% 8%;
-    --secondary: 226 20% 14%;
-    --secondary-foreground: 213 27% 84%;
-    --muted: 226 20% 14%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 217 85% 63%;
-    --accent-foreground: 222 31% 8%;
-    --destructive: 0 63% 60%;
-    --destructive-foreground: 213 27% 84%;
-    --border: 226 20% 24%;
-    --input: 226 20% 20%;
-    --ring: 217 85% 63%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 12 32% 86%;            /* #E9D5CD */
+    --input: 12 32% 86%;
+    --ring: 27 89% 54%;
     --radius: 0.5rem;
   }
 }
 
 body {
-  color: #e2e8f0;
-  background: #0f1117;
+  color: #2D2420;
+  background: #F7F1E9;
 }

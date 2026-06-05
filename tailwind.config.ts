@@ -42,10 +42,17 @@ const config: Config = {
         ring:   "hsl(var(--ring))",
 
         // 프로젝트 커스텀 토큰 (hex → accent는 CSS var로 맞춤)
-        "bg-base":     "#0f1117",
-        "bg-surface":  "#1a1d27",
-        "bg-card":     "#21253a",
-        // accent: CSS var(--accent) = hsl(217 85% 63%) ≈ #4f8ef7
+        "bg-base":        "#F7F1E9",
+        "bg-surface":     "#FFFFFF",
+        "bg-card":        "#EDE6DD",
+        "border-color":   "#E9D5CD",
+        "text-primary":   "#2D2420",
+        "text-secondary": "#767171",
+        "text-muted":     "#937B6E",
+        "text-disabled":  "#A6A6A6",
+        "accent-hover":   "#F89B5C",
+        "accent-light":   "#FBB584",
+        // accent: CSS var(--accent) = hsl(27 89% 54%) ≈ #F37321
         accent: {
           DEFAULT:    "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",

@@ -104,7 +104,7 @@ export default function ClausePage() {
         actions={
           <Button
             size="sm" variant="ghost"
-            className="text-white/50 hover:text-white gap-1.5"
+            className="text-text-muted hover:text-text-primary gap-1.5"
             onClick={handleReset}
           >
             <RotateCcw size={14} />
@@ -115,18 +115,18 @@ export default function ClausePage() {
 
       <div className="flex-1 overflow-y-auto p-5 space-y-4">
         {/* ── 입력 영역 ────────────────────────────────────────── */}
-        <Card className="bg-bg-card border-white/10">
+        <Card className="bg-bg-card border-border-color">
           <CardContent className="pt-4 pb-4 space-y-3">
             <Textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="특약 원문 텍스트를 여기에 붙여넣으세요..."
-              className="min-h-28 bg-bg-surface border-white/10 text-white placeholder:text-white/25 focus-visible:ring-accent/50 resize-none text-sm font-mono leading-relaxed"
+              className="min-h-28 bg-bg-surface border-border-color text-text-primary placeholder:text-text-disabled focus-visible:ring-accent/50 resize-none text-sm font-mono leading-relaxed"
             />
 
             <div className="flex flex-wrap items-center gap-2">
               {/* 파일 업로드 */}
-              <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/10 bg-bg-surface text-xs text-white/55 hover:border-white/30 hover:text-white cursor-pointer transition-colors">
+              <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border-color bg-bg-surface text-xs text-text-secondary hover:border-border-color hover:text-text-primary cursor-pointer transition-colors">
                 <FileUp size={13} />
                 PDF / DOCX 업로드
                 <input
@@ -148,7 +148,7 @@ export default function ClausePage() {
               {/* 샘플 텍스트 */}
               <Button
                 size="sm" variant="ghost"
-                className="text-white/40 hover:text-white gap-1.5 text-xs"
+                className="text-text-disabled hover:text-text-primary gap-1.5 text-xs"
                 onClick={() => { setText(SAMPLE_TEXT); setFileName(null); setFileData(null) }}
               >
                 <FlaskConical size={13} />
@@ -175,7 +175,7 @@ export default function ClausePage() {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-4 items-start">
           {/* 좌: 원문 뷰어 */}
           <div>
-            <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">원문 뷰어</p>
+            <p className="text-[10px] font-semibold text-text-disabled uppercase tracking-widest mb-2">원문 뷰어</p>
             <TextViewer
               text={result?.originalText ?? ''}
               highlights={result?.flags.map((f) => ({ keyword: f.keyword, level: f.level }))}
@@ -185,10 +185,10 @@ export default function ClausePage() {
           {/* 우: 알럿 패널 */}
           <div className="space-y-3">
             {/* 위험도 점수 카드 */}
-            <Card className="bg-bg-card border-white/10">
+            <Card className="bg-bg-card border-border-color">
               <CardHeader className="pb-2 flex flex-row items-center gap-2">
-                <AlertTriangle size={13} className="text-white/40" />
-                <CardTitle className="text-[10px] font-semibold text-white/40 uppercase tracking-widest">위험도 점수</CardTitle>
+                <AlertTriangle size={13} className="text-text-disabled" />
+                <CardTitle className="text-[10px] font-semibold text-text-disabled uppercase tracking-widest">위험도 점수</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {/* 레벨 배지 3개 */}
@@ -197,8 +197,8 @@ export default function ClausePage() {
                     const cfg = LEVEL_CONFIG[lv]
                     const active = result?.level === lv
                     return (
-                      <div key={lv} className={`flex-1 text-center py-1.5 rounded-lg transition-all ${active ? cfg.bg : 'bg-white/5'}`}>
-                        <span className={`text-xs font-bold ${active ? cfg.color : 'text-white/20'}`}>{lv}</span>
+                      <div key={lv} className={`flex-1 text-center py-1.5 rounded-lg transition-all ${active ? cfg.bg : 'bg-black/[0.04]'}`}>
+                        <span className={`text-xs font-bold ${active ? cfg.color : 'text-text-disabled'}`}>{lv}</span>
                       </div>
                     )
                   })}
@@ -207,18 +207,18 @@ export default function ClausePage() {
                 {/* 프로그레스 바 */}
                 <div className="space-y-1">
                   <div className="flex justify-between items-center">
-                    <span className="text-[10px] text-white/40">위험 점수</span>
-                    <span className={`text-sm font-bold ${levelCfg?.color ?? 'text-white/30'}`}>
-                      {result?.score ?? 0} <span className="text-xs font-normal text-white/30">/ 100</span>
+                    <span className="text-[10px] text-text-disabled">위험 점수</span>
+                    <span className={`text-sm font-bold ${levelCfg?.color ?? 'text-text-disabled'}`}>
+                      {result?.score ?? 0} <span className="text-xs font-normal text-text-disabled">/ 100</span>
                     </span>
                   </div>
-                  <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-black/[0.06] rounded-full overflow-hidden">
                     <div
-                      className={`h-full rounded-full transition-all duration-700 ${levelCfg?.bar ?? 'bg-white/20'}`}
+                      className={`h-full rounded-full transition-all duration-700 ${levelCfg?.bar ?? 'bg-black/[0.10]'}`}
                       style={{ width: `${result?.score ?? 0}%` }}
                     />
                   </div>
-                  <div className="flex gap-3 text-[10px] text-white/35">
+                  <div className="flex gap-3 text-[10px] text-text-muted">
                     <span className="text-risk-red">RED {redCount}건</span>
                     <span className="text-risk-orange">ORANGE {orangeCount}건</span>
                     <span>누락 {result?.missingItems.length ?? 0}건</span>
@@ -227,23 +227,23 @@ export default function ClausePage() {
 
                 {/* AI 분석 요약 */}
                 {result && (
-                  <div className="space-y-2 pt-1 border-t border-white/10">
+                  <div className="space-y-2 pt-1 border-t border-border-color">
                     <div className="flex items-start gap-1.5">
                       <Sparkles size={12} className="text-accent flex-shrink-0 mt-0.5" />
                       <div>
                         <p className="text-[10px] font-semibold text-accent mb-1">AI 분석 요약</p>
-                        <p className="text-xs text-white/55 leading-relaxed">{result.aiSummary}</p>
+                        <p className="text-xs text-text-secondary leading-relaxed">{result.aiSummary}</p>
                       </div>
                     </div>
                     <div className="bg-bg-surface rounded-lg px-3 py-2">
-                      <p className="text-[10px] font-semibold text-white/40 mb-0.5">인수 권고사항</p>
-                      <p className="text-xs text-white/65 leading-relaxed">{result.recommendation}</p>
+                      <p className="text-[10px] font-semibold text-text-disabled mb-0.5">인수 권고사항</p>
+                      <p className="text-xs text-text-secondary leading-relaxed">{result.recommendation}</p>
                     </div>
                   </div>
                 )}
 
                 {!result && (
-                  <p className="text-[11px] text-white/25 text-center pt-1">스크리닝 전 미리보기</p>
+                  <p className="text-[11px] text-text-disabled text-center pt-1">스크리닝 전 미리보기</p>
                 )}
               </CardContent>
             </Card>
@@ -251,7 +251,7 @@ export default function ClausePage() {
             {/* Flag 목록 */}
             {result && result.flags.length > 0 && (
               <div className="space-y-2">
-                <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest">
+                <p className="text-[10px] font-semibold text-text-disabled uppercase tracking-widest">
                   발견된 조항 ({result.flags.length}건)
                 </p>
                 {result.flags.map((flag, i) => (
@@ -263,7 +263,7 @@ export default function ClausePage() {
             {/* 누락 항목 목록 */}
             {result && result.missingItems.length > 0 && (
               <div className="space-y-2">
-                <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest flex items-center gap-1.5">
+                <p className="text-[10px] font-semibold text-text-disabled uppercase tracking-widest flex items-center gap-1.5">
                   <ClipboardList size={11} />
                   누락 체크 항목 ({result.missingItems.length}건)
                 </p>
@@ -275,10 +275,10 @@ export default function ClausePage() {
 
             {/* 빈 상태 */}
             {!result && (
-              <Card className="bg-bg-card border-white/10">
+              <Card className="bg-bg-card border-border-color">
                 <CardContent className="py-8 text-center">
-                  <AlertTriangle size={20} className="text-white/15 mx-auto mb-2" />
-                  <p className="text-xs text-white/30">스크리닝 후 Flag 목록이 표시됩니다</p>
+                  <AlertTriangle size={20} className="text-text-disabled mx-auto mb-2" />
+                  <p className="text-xs text-text-disabled">스크리닝 후 Flag 목록이 표시됩니다</p>
                 </CardContent>
               </Card>
             )}
