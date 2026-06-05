@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import {
-  LayoutDashboard, Newspaper, FileSearch, Scale, Settings, Mail,
+  LayoutDashboard, Newspaper, FileSearch, Scale, Settings, Mail, BookOpen,
 } from 'lucide-react'
 
 const navItems = [
@@ -13,6 +13,7 @@ const navItems = [
   { href: '/clause', label: 'Clause Finder', icon: FileSearch },
   { href: '/email', label: '메일 작성기', icon: Mail },
   { href: '/legal', label: '법령 조회', icon: Scale },
+  { href: '/glossary', label: '용어 사전', icon: BookOpen },
   { href: '/settings', label: '설정', icon: Settings },
 ]
 
