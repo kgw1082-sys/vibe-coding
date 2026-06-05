@@ -1,51 +1,83 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { toast } from 'sonner'
 import Topbar from '@/components/layout/Topbar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
-import { Tag, AlertTriangle, Bell, X, Save } from 'lucide-react'
+import { Tag, AlertTriangle, Bell, X, Plus } from 'lucide-react'
 import { NEWS_TAGS } from '@/lib/mock-data'
 import { RED_FLAG_KEYWORDS, ORANGE_FLAG_KEYWORDS } from '@/lib/clause-keywords'
+import { loadSettings, saveSettings } from '@/lib/user-settings'
+import type { UserSettings, KeywordEntry } from '@/lib/user-settings'
 
 export default function SettingsPage() {
-  const [selectedTags, setSelectedTags] = useState<string[]>(['P&C Insurance', 'Reinsurance', 'Cyber Risk'])
-  const [notifications, setNotifications] = useState({
-    newArticles: true,
-    redFlag: true,
-    weeklyDigest: false,
-    legalUpdates: true,
-  })
+  const [settings, setSettings] = useState<UserSettings | null>(null)
+  const [newKeyword, setNewKeyword] = useState('')
+  const [newKeywordLevel, setNewKeywordLevel] = useState<'red' | 'orange'>('red')
+  const [newKeywordDesc, setNewKeywordDesc] = useState('')
+
+  useEffect(() => {
+    setSettings(loadSettings())
+  }, [])
+
+  const persist = useCallback((next: UserSettings) => {
+    setSettings(next)
+    try {
+      saveSettings(next)
+      toast.success('설정이 저장되었습니다')
+    } catch {
+      toast.error('설정 저장에 실패했습니다')
+    }
+  }, [])
 
   const toggleTag = (tag: string) => {
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-    )
+    if (!settings) return
+    const newsTags = settings.newsTags.includes(tag)
+      ? settings.newsTags.filter((t) => t !== tag)
+      : [...settings.newsTags, tag]
+    persist({ ...settings, newsTags })
   }
 
-  const toggleNotification = (key: keyof typeof notifications) => {
-    setNotifications((prev) => ({ ...prev, [key]: !prev[key] }))
+  const toggleNotification = (key: keyof UserSettings['notifications']) => {
+    if (!settings) return
+    persist({
+      ...settings,
+      notifications: { ...settings.notifications, [key]: !settings.notifications[key] },
+    })
   }
+
+  const addKeyword = () => {
+    if (!settings || !newKeyword.trim()) return
+    const entry: KeywordEntry = {
+      keyword: newKeyword.trim(),
+      level: newKeywordLevel,
+      description: newKeywordDesc.trim(),
+    }
+    persist({ ...settings, customKeywords: [...settings.customKeywords, entry] })
+    setNewKeyword('')
+    setNewKeywordDesc('')
+  }
+
+  const removeKeyword = (index: number) => {
+    if (!settings) return
+    const customKeywords = settings.customKeywords.filter((_, i) => i !== index)
+    persist({ ...settings, customKeywords })
+  }
+
+  if (!settings) return null
 
   return (
     <>
-      <Topbar
-        title="설정"
-        description="US Expat Hub 환경 설정"
-        actions={
-          <Button size="sm" className="bg-accent hover:bg-accent/80 text-white gap-1.5">
-            <Save size={14} />
-            저장
-          </Button>
-        }
-      />
+      <Topbar title="설정" description="US Expat Hub 환경 설정" />
 
       <div className="flex-1 overflow-y-auto p-5 space-y-4 max-w-2xl">
 
-        {/* 뉴스 관심 태그 관리 */}
+        {/* 뉴스 관심 태그 */}
         <Card className="bg-bg-card border-white/10">
           <CardHeader className="pb-3 flex flex-row items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-accent/15 flex items-center justify-center">
@@ -60,7 +92,7 @@ export default function SettingsPage() {
           <CardContent className="space-y-3">
             <div className="flex flex-wrap gap-2">
               {NEWS_TAGS.filter((t) => t !== '전체').map((tag) => {
-                const active = selectedTags.includes(tag)
+                const active = settings.newsTags.includes(tag)
                 return (
                   <button
                     key={tag}
@@ -77,9 +109,7 @@ export default function SettingsPage() {
                 )
               })}
             </div>
-            <p className="text-[11px] text-white/30">
-              {selectedTags.length}개 태그 선택됨
-            </p>
+            <p className="text-[11px] text-white/30">{settings.newsTags.length}개 태그 선택됨</p>
           </CardContent>
         </Card>
 
@@ -96,35 +126,85 @@ export default function SettingsPage() {
           </CardHeader>
           <Separator className="bg-white/10 mb-3" />
           <CardContent className="space-y-4">
+            {/* 기본 키워드 */}
             <div className="space-y-2">
               <p className="text-xs font-semibold text-risk-red flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-risk-red inline-block" />
-                RED — 즉시 검토 필요
+                RED — 기본 키워드
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {RED_FLAG_KEYWORDS.map((kw) => (
-                  <Badge key={kw} className="text-[11px] bg-risk-red/10 text-risk-red border border-risk-red/20">
-                    {kw}
-                  </Badge>
+                  <Badge key={kw} className="text-[11px] bg-risk-red/10 text-risk-red border border-risk-red/20">{kw}</Badge>
                 ))}
               </div>
             </div>
             <div className="space-y-2">
               <p className="text-xs font-semibold text-risk-orange flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-risk-orange inline-block" />
-                ORANGE — 누락 여부 체크
+                ORANGE — 기본 키워드
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {ORANGE_FLAG_KEYWORDS.map((kw) => (
-                  <Badge key={kw} className="text-[11px] bg-risk-orange/10 text-risk-orange border border-risk-orange/20">
-                    {kw}
-                  </Badge>
+                  <Badge key={kw} className="text-[11px] bg-risk-orange/10 text-risk-orange border border-risk-orange/20">{kw}</Badge>
                 ))}
               </div>
             </div>
-            <Button size="sm" variant="outline" className="border-white/10 text-white/50 hover:text-white hover:border-white/30 text-xs">
-              + 키워드 추가
-            </Button>
+
+            {/* 사용자 추가 키워드 */}
+            {settings.customKeywords.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs font-semibold text-white/60">사용자 추가 키워드</p>
+                <div className="space-y-1.5">
+                  {settings.customKeywords.map((entry, i) => (
+                    <div key={i} className="flex items-center gap-2 p-2 rounded-lg bg-white/5">
+                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${entry.level === 'red' ? 'bg-risk-red' : 'bg-risk-orange'}`} />
+                      <span className="text-xs text-white font-medium flex-1">{entry.keyword}</span>
+                      {entry.description && <span className="text-[11px] text-white/40 flex-1">{entry.description}</span>}
+                      <button onClick={() => removeKeyword(i)} className="text-white/30 hover:text-white/70 transition-colors">
+                        <X size={12} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 키워드 추가 폼 */}
+            <div className="space-y-2 pt-1">
+              <p className="text-xs text-white/40">새 키워드 추가</p>
+              <div className="flex gap-2">
+                <Input
+                  value={newKeyword}
+                  onChange={(e) => setNewKeyword(e.target.value)}
+                  placeholder="키워드"
+                  className="bg-white/5 border-white/10 text-white text-xs h-8"
+                  onKeyDown={(e) => e.key === 'Enter' && addKeyword()}
+                />
+                <select
+                  value={newKeywordLevel}
+                  onChange={(e) => setNewKeywordLevel(e.target.value as 'red' | 'orange')}
+                  className="bg-white/5 border border-white/10 text-white text-xs rounded-md px-2 h-8"
+                >
+                  <option value="red">RED</option>
+                  <option value="orange">ORANGE</option>
+                </select>
+              </div>
+              <Input
+                value={newKeywordDesc}
+                onChange={(e) => setNewKeywordDesc(e.target.value)}
+                placeholder="설명 (선택)"
+                className="bg-white/5 border-white/10 text-white text-xs h-8"
+              />
+              <Button
+                size="sm"
+                onClick={addKeyword}
+                disabled={!newKeyword.trim()}
+                className="bg-accent hover:bg-accent/80 text-white gap-1.5 text-xs"
+              >
+                <Plus size={12} />
+                추가
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
@@ -141,12 +221,11 @@ export default function SettingsPage() {
           </CardHeader>
           <Separator className="bg-white/10 mb-3" />
           <CardContent className="space-y-0">
-            {[
-              { key: 'newArticles' as const, label: '새 기사 알림', desc: '관심 태그에 새 기사가 등록되면 알림을 받습니다' },
+            {([
+              { key: 'newsRefresh' as const, label: '새 기사 알림', desc: '관심 태그에 새 기사가 등록되면 알림을 받습니다' },
               { key: 'redFlag' as const, label: 'Red Flag 감지', desc: 'Clause 스크리닝에서 RED 등급 조항 발견 시 알림' },
-              { key: 'weeklyDigest' as const, label: '주간 다이제스트', desc: '매주 월요일 보험 시장 동향 요약을 이메일로 받습니다' },
-              { key: 'legalUpdates' as const, label: '법령 개정 알림', desc: '관심 주의 보험 법령 변경사항을 알려드립니다' },
-            ].map(({ key, label, desc }, i, arr) => (
+              { key: 'lawUpdate' as const, label: '법령 개정 알림', desc: '관심 주의 보험 법령 변경사항을 알려드립니다' },
+            ]).map(({ key, label, desc }, i, arr) => (
               <div key={key}>
                 <div className="flex items-center justify-between py-3">
                   <div>
@@ -154,7 +233,7 @@ export default function SettingsPage() {
                     <p className="text-xs text-white/40 mt-0.5">{desc}</p>
                   </div>
                   <Switch
-                    checked={notifications[key]}
+                    checked={settings.notifications[key]}
                     onCheckedChange={() => toggleNotification(key)}
                     className="data-[state=checked]:bg-accent"
                   />
