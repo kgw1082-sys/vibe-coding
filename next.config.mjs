@@ -3,9 +3,7 @@ const nextConfig = {
   images: {
     domains: ['lh3.googleusercontent.com'],
   },
-  experimental: {
-    serverExternalPackages: ['pdf-parse'],
-  },
+  serverExternalPackages: ['pdf-parse'],
 }
 
 export default nextConfig
