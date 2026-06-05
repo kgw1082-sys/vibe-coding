@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { NextResponse } from 'next/server'
 import anthropic from '@/lib/anthropic'
 import { CLAUSE_KEYWORDS } from '@/lib/clause-keywords'

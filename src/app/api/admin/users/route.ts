@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { NextResponse } from 'next/server'
 import redis from '@/lib/redis'
 import { keys, getUser, requireAdmin } from '@/lib/auth'

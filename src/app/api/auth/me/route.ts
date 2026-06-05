@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { NextResponse } from 'next/server'
 import { resolveUser } from '@/lib/auth'
 import { seedAdminIfNeeded } from '@/lib/auth-seed'
