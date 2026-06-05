@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import axios from 'axios'
 import anthropic from '@/lib/anthropic'
 import type { LawSearchResult } from '@/types'
+import { missingApiKey, rateLimited, internalError, isRateLimit } from '@/lib/api-error'
 
 const STATIC_EXAMPLES: LawSearchResult[] = [
   {
@@ -150,17 +151,25 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'q is required' }, { status: 400 })
   }
 
-  let results: LawSearchResult[] = []
+  if (!process.env.CONGRESS_API_KEY) return missingApiKey('Congress API')
 
-  if (scope !== 'state') {
-    const [congress, ecfr] = await Promise.all([searchCongress(query), searchEcfr(query)])
-    results = [...congress, ...ecfr]
+  try {
+    let results: LawSearchResult[] = []
+
+    if (scope !== 'state') {
+      const [congress, ecfr] = await Promise.all([searchCongress(query), searchEcfr(query)])
+      results = [...congress, ...ecfr]
+    }
+
+    if (results.length === 0) {
+      results = await searchViaAI(query)
+    }
+
+    results.sort((a, b) => b.relevanceScore - a.relevanceScore)
+    return NextResponse.json({ results, query })
+  } catch (err) {
+    if (isRateLimit(err)) return rateLimited()
+    console.error('[/api/legal/search]', err)
+    return NextResponse.json(STATIC_EXAMPLES)
   }
-
-  if (results.length === 0) {
-    results = await searchViaAI(query)
-  }
-
-  results.sort((a, b) => b.relevanceScore - a.relevanceScore)
-  return NextResponse.json({ results, query })
 }

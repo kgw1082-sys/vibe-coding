@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import anthropic from '@/lib/anthropic'
 import type { LegalQueryRequest, LegalQueryResult, LawRef } from '@/types'
+import { missingApiKey, rateLimited, isRateLimit } from '@/lib/api-error'
 
 const MOCK_RESULT: LegalQueryResult = {
   question: '',
@@ -18,9 +19,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: '질의 내용이 필요합니다.' }, { status: 400 })
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return NextResponse.json({ ...MOCK_RESULT, question } satisfies LegalQueryResult)
-  }
+  if (!process.env.ANTHROPIC_API_KEY) return missingApiKey('AI 분석')
 
   const context = [
     state    && `대상 주(State): ${state}`,
@@ -80,9 +79,9 @@ verdict 기준:
       confidence: parsed.confidence ?? 'LOW',
     }
     return NextResponse.json(result)
-  } catch {
-    return NextResponse.json(
-      { ...MOCK_RESULT, question, answer: '분석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.' } satisfies LegalQueryResult,
-    )
+  } catch (err) {
+    if (isRateLimit(err)) return rateLimited()
+    console.error('[/api/legal/query]', err)
+    return NextResponse.json({ ...MOCK_RESULT, question } satisfies LegalQueryResult)
   }
 }

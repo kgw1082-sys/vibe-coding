@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import anthropic from '@/lib/anthropic'
 import { CLAUSE_KEYWORDS } from '@/lib/clause-keywords'
 import type { FlagItem, MissingItem, ClauseScanResult } from '@/types'
+import { missingApiKey, rateLimited, internalError, isRateLimit } from '@/lib/api-error'
 
 const MISSING_DESCRIPTIONS: Record<string, string> = {
   Deductible:           '자기부담금 조항이 명시되지 않았습니다',
@@ -62,6 +63,7 @@ interface AiFlag {
 }
 
 export async function POST(request: Request) {
+  try {
   const body = await request.json()
   const { text: inputText, fileBase64, fileName } = body as {
     text?: string
@@ -120,17 +122,7 @@ export async function POST(request: Request) {
   let aiFlags: AiFlag[] = []
 
   // ── API 키 미설정 시 mock 응답 ────────────────────────────
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return NextResponse.json({
-      originalText: text,
-      flags: flags,
-      missingItems,
-      score,
-      level,
-      aiSummary: 'AI 분석 기능은 API 키 설정 후 활성화됩니다. (.env.local의 ANTHROPIC_API_KEY를 설정하세요)',
-      recommendation: ruleBasedRec,
-    } satisfies ClauseScanResult)
-  }
+  if (!process.env.ANTHROPIC_API_KEY) return missingApiKey('AI 분석')
 
   // ── Claude AI 분석 ─────────────────────────────────────────
   try {
@@ -197,4 +189,9 @@ ${text}
   }
 
   return NextResponse.json(result)
+  } catch (err) {
+    if (isRateLimit(err)) return rateLimited()
+    console.error('[/api/clause/scan]', err)
+    return internalError()
+  }
 }
