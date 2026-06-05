@@ -7,6 +7,11 @@ import MobileTabBar from '@/components/layout/MobileTabBar'
 export const metadata: Metadata = {
   title: 'US Expat Hub',
   description: 'Insurance Intelligence for US Expatriates',
+  openGraph: {
+    title: 'US Expat Hub',
+    description: 'Insurance Intelligence for US Expatriates',
+    images: [{ url: '/images/hanwha-insurance-logo.jpg' }],
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
