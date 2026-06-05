@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import axios from 'axios'
 import anthropic from '@/lib/anthropic'
 import type { LawSearchResult } from '@/types'
-import { missingApiKey, rateLimited, internalError, isRateLimit } from '@/lib/api-error'
+import { missingApiKey, rateLimited, isRateLimit } from '@/lib/api-error'
 
 const STATIC_EXAMPLES: LawSearchResult[] = [
   {
@@ -75,8 +75,8 @@ async function searchEcfr(query: string): Promise<LawSearchResult[]> {
     // fix before JSON.parse so field values are clean.
     const fixedText = text.replace(/Â§/g, '§').replace(/Â/g, '')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const json = JSON.parse(fixedText) as any
-    const items: any[] = json?.results ?? []
+    const json = JSON.parse(fixedText) as { results?: Array<{ hierarchy?: Record<string, string>; hierarchy_headings?: Record<string, string>; headings?: Record<string, string>; full_text_excerpt?: string; score?: number; starts_on?: string }> }
+    const items = json?.results ?? []
     const seen = new Set<string>()
     const results: LawSearchResult[] = []
     for (const item of items) {
