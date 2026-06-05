@@ -1,15 +1,16 @@
-'use client'
+﻿'use client'
 
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import {
-  LayoutDashboard, Newspaper, FileSearch, Scale, Settings, Mail, BookOpen, Wrench, LogOut,
+  LayoutDashboard, Newspaper, FileSearch, Scale, Settings, Mail, BookOpen, Wrench, LogOut, CalendarDays,
 } from 'lucide-react'
 import { useAuth } from '@/components/providers/AuthProvider'
 
 const navItems = [
   { href: '/', label: '대시보드', icon: LayoutDashboard },
+  { href: '/calendar', label: '캘린더', icon: CalendarDays },
   { href: '/news', label: '뉴스 피드', icon: Newspaper },
   { href: '/clause', label: 'Clause Finder', icon: FileSearch },
   { href: '/email', label: '메일 작성기', icon: Mail },

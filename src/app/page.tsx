@@ -1,30 +1,27 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import Topbar from '@/components/layout/Topbar'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
   Newspaper, FileSearch, Scale, Mail, BookOpen, Settings,
-  Plus, ChevronRight, Clock, TrendingUp,
+  Plus, ChevronRight, Clock, TrendingUp, CalendarDays, Trash2,
 } from 'lucide-react'
 import { MOCK_RECENT_NEWS } from '@/lib/mock-data'
-
-const SCHEDULES = [
-  { time: '10:00', title: '뉴욕지점 주간 미팅' },
-  { time: '14:00', title: '재보험사 컨퍼런스콜 (Munich Re)' },
-  { time: '16:30', title: '언더라이팅 보고서 제출 마감' },
-]
+import { getEventsForDate, deleteEvent, toDateStr, type ScheduleEvent } from '@/lib/schedule'
 
 const SHORTCUTS = [
-  { href: '/news',     icon: Newspaper,  label: '뉴스 피드' },
-  { href: '/clause',   icon: FileSearch, label: 'Clause Finder' },
-  { href: '/legal',    icon: Scale,      label: '법령 조회' },
-  { href: '/email',    icon: Mail,       label: '메일 작성기' },
-  { href: '#',         icon: BookOpen,   label: '용어 사전' },
-  { href: '/settings', icon: Settings,   label: '설정' },
+  { href: '/calendar', icon: CalendarDays, label: '캘린더' },
+  { href: '/news',     icon: Newspaper,   label: '뉴스 피드' },
+  { href: '/clause',   icon: FileSearch,  label: 'Clause Finder' },
+  { href: '/legal',    icon: Scale,       label: '법령 조회' },
+  { href: '/email',    icon: Mail,        label: '메일 작성기' },
+  { href: '/glossary', icon: BookOpen,    label: '용어 사전' },
+  { href: '/settings', icon: Settings,    label: '설정' },
 ]
 
 function todayLabel() {
@@ -33,13 +30,34 @@ function todayLabel() {
   })
 }
 
+const DOT_COLOR: Record<string, string> = {
+  orange: 'bg-accent',
+  blue: 'bg-blue-500',
+  green: 'bg-emerald-500',
+  red: 'bg-risk-red',
+}
+
 export default function DashboardPage() {
-  const [today, setToday] = useState('')
+  const [todayStr, setTodayStr] = useState('')
+  const [todayEvents, setTodayEvents] = useState<ScheduleEvent[]>([])
   const { user } = useAuth()
+  const router = useRouter()
+
+  const todayDate = toDateStr(new Date())
+
+  const refreshEvents = useCallback(() => {
+    setTodayEvents(getEventsForDate(todayDate))
+  }, [todayDate])
 
   useEffect(() => {
-    setToday(todayLabel())
-  }, [])
+    setTodayStr(todayLabel())
+    refreshEvents()
+  }, [refreshEvents])
+
+  const handleDelete = (id: string) => {
+    deleteEvent(id)
+    refreshEvents()
+  }
 
   return (
     <>
@@ -50,7 +68,7 @@ export default function DashboardPage() {
         {/* [1] 웰컴 헤더 */}
         <div>
           <h2 className="text-xl font-bold text-text-primary">안녕하세요, {user?.name ?? '...'}님 👋</h2>
-          <p className="text-sm text-text-muted mt-0.5">{today}</p>
+          <p className="text-sm text-text-muted mt-0.5">{todayStr}</p>
         </div>
 
         {/* [2] 오늘의 일정 */}
@@ -60,27 +78,46 @@ export default function DashboardPage() {
               <Clock size={15} className="text-accent" />
               오늘의 일정
             </h3>
-            <Button size="sm" variant="outline"
+            <Button size="sm" variant="outline" onClick={() => router.push('/calendar')}
               className="h-7 text-xs gap-1 border-border-color text-text-secondary hover:text-text-primary hover:border-accent/50">
               <Plus size={12} /> 일정 추가
             </Button>
           </div>
           <Card className="bg-bg-card border-border-color">
             <CardContent className="py-2 px-4">
-              {SCHEDULES.length === 0 ? (
-                <p className="text-sm text-text-disabled py-4 text-center">오늘 등록된 일정이 없습니다</p>
+              {todayEvents.length === 0 ? (
+                <div className="py-5 text-center space-y-2">
+                  <p className="text-sm text-text-disabled">오늘 등록된 일정이 없습니다</p>
+                  <button onClick={() => router.push('/calendar')}
+                    className="text-xs text-accent hover:underline">
+                    + 캘린더에서 추가하기
+                  </button>
+                </div>
               ) : (
                 <div>
-                  {SCHEDULES.map(({ time, title }, i) => (
-                    <div key={i} className={`flex items-center gap-4 py-3 ${i < SCHEDULES.length - 1 ? 'border-b border-border-color/50' : ''}`}>
-                      <span className="text-xs font-semibold text-accent w-10 flex-shrink-0">{time}</span>
-                      <span className="text-sm text-text-primary">{title}</span>
+                  {todayEvents.map((event, i) => (
+                    <div key={event.id}
+                      className={`flex items-center gap-3 py-3 group ${i < todayEvents.length - 1 ? 'border-b border-border-color/50' : ''}`}>
+                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${DOT_COLOR[event.color ?? 'orange'] ?? 'bg-accent'}`} />
+                      {event.time && (
+                        <span className="text-xs font-semibold text-accent w-10 flex-shrink-0">{event.time}</span>
+                      )}
+                      <span className="text-sm text-text-primary flex-1">{event.title}</span>
+                      <button onClick={() => handleDelete(event.id)}
+                        className="opacity-0 group-hover:opacity-100 text-text-disabled hover:text-risk-red transition-all p-1 rounded">
+                        <Trash2 size={12} />
+                      </button>
                     </div>
                   ))}
                 </div>
               )}
             </CardContent>
           </Card>
+          {todayEvents.length > 0 && (
+            <Link href="/calendar" className="text-xs text-accent hover:underline flex items-center gap-0.5 mt-2 justify-end">
+              캘린더 전체 보기 <ChevronRight size={11} />
+            </Link>
+          )}
         </section>
 
         {/* [3] 오늘의 주요 뉴스 */}
@@ -114,7 +151,7 @@ export default function DashboardPage() {
         {/* [4] 바로가기 */}
         <section>
           <h3 className="text-sm font-semibold text-text-primary mb-3">바로가기</h3>
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+          <div className="grid grid-cols-4 sm:grid-cols-7 gap-3">
             {SHORTCUTS.map(({ href, icon: Icon, label }) => (
               <Link key={label} href={href}>
                 <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-bg-card border border-border-color hover:border-accent/40 hover:bg-accent/5 transition-colors cursor-pointer">
