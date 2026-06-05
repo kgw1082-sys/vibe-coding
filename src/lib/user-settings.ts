@@ -32,7 +32,12 @@ export function loadSettings(): UserSettings {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return DEFAULT_SETTINGS
-    return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) }
+    const parsed = JSON.parse(raw)
+    return {
+      ...DEFAULT_SETTINGS,
+      ...parsed,
+      notifications: { ...DEFAULT_SETTINGS.notifications, ...(parsed?.notifications ?? {}) },
+    }
   } catch {
     return DEFAULT_SETTINGS
   }
@@ -40,5 +45,9 @@ export function loadSettings(): UserSettings {
 
 export function saveSettings(settings: UserSettings): void {
   if (typeof window === 'undefined') return
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
+  } catch {
+    console.error('Failed to save settings to localStorage')
+  }
 }
