@@ -1,9 +1,8 @@
 import type { Metadata } from 'next'
 import { Toaster } from 'sonner'
 import './globals.css'
-import Sidebar from '@/components/layout/Sidebar'
-import MobileTabBar from '@/components/layout/MobileTabBar'
 import { AuthProvider } from '@/components/providers/AuthProvider'
+import LayoutShell from '@/components/providers/LayoutShell'
 
 export const metadata: Metadata = {
   title: 'US Expat Hub',
@@ -20,13 +19,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ko">
       <body className="font-sans bg-bg-base text-text-primary antialiased">
         <AuthProvider>
-          <div className="flex h-screen overflow-hidden">
-            <Sidebar />
-            <main className="flex-1 flex flex-col overflow-hidden pb-16 md:pb-0">
-              {children}
-            </main>
-          </div>
-          <MobileTabBar />
+          <LayoutShell>
+            {children}
+          </LayoutShell>
         </AuthProvider>
         <Toaster
           theme="light"
