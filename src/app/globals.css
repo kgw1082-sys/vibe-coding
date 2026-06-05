@@ -2,6 +2,42 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'HanwhaGothic';
+  src: url('/fonts/08HanwhaGothicT.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'HanwhaGothic';
+  src: url('/fonts/07HanwhaGothicEL.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'HanwhaGothic';
+  src: url('/fonts/06HanwhaGothicL.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'HanwhaGothic';
+  src: url('/fonts/05HanwhaGothicR.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'HanwhaGothic';
+  src: url('/fonts/04HanwhaGothicB.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   :root {
     /* shadcn/ui vars — light warm theme */

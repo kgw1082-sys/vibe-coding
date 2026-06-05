@@ -9,6 +9,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['HanwhaGothic', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
       colors: {
         // shadcn/ui CSS variable 매핑
         background:  "hsl(var(--background))",
