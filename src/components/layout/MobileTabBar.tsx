@@ -2,12 +2,13 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Newspaper, FileSearch, Scale, Settings } from 'lucide-react'
+import { LayoutDashboard, Newspaper, FileSearch, Scale, Settings, Mail } from 'lucide-react'
 
 const navItems = [
   { href: '/', label: '대시보드', icon: LayoutDashboard },
   { href: '/news', label: '뉴스', icon: Newspaper },
   { href: '/clause', label: 'Clause', icon: FileSearch },
+  { href: '/email', label: '메일', icon: Mail },
   { href: '/legal', label: '법령', icon: Scale },
   { href: '/settings', label: '설정', icon: Settings },
 ]

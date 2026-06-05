@@ -4,13 +4,14 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import {
-  LayoutDashboard, Newspaper, FileSearch, Scale, Settings,
+  LayoutDashboard, Newspaper, FileSearch, Scale, Settings, Mail,
 } from 'lucide-react'
 
 const navItems = [
   { href: '/', label: '대시보드', icon: LayoutDashboard },
   { href: '/news', label: '뉴스 피드', icon: Newspaper },
   { href: '/clause', label: 'Clause Finder', icon: FileSearch },
+  { href: '/email', label: '메일 작성기', icon: Mail },
   { href: '/legal', label: '법령 조회', icon: Scale },
   { href: '/settings', label: '설정', icon: Settings },
 ]
