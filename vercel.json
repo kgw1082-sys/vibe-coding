@@ -1,0 +1,6 @@
+{
+  "functions": {
+    "app/api/clause/scan/route.ts": { "maxDuration": 30 },
+    "app/api/legal/query/route.ts": { "maxDuration": 30 }
+  }
+}
