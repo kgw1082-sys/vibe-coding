@@ -1,4 +1,11 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+  images: {
+    domains: ['lh3.googleusercontent.com'],
+  },
+  experimental: {
+    serverExternalPackages: ['pdf-parse'],
+  },
+}
 
-export default nextConfig;
+export default nextConfig
