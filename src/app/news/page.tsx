@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input'
 import { RefreshCw, Sparkles, Bookmark, BookmarkCheck, ExternalLink, Plus, X, AlertCircle } from 'lucide-react'
 import { NEWS_TAGS } from '@/lib/mock-data'
 import { loadSettings } from '@/lib/user-settings'
-import type { NewsArticle, NewsResponse } from '@/types'
+import type { NewsArticle } from '@/types'
 
 // ── 스켈레톤 카드 ───────────────────────────────────────────────────────
 function NewsCardSkeleton() {
@@ -174,6 +174,7 @@ export default function NewsPage() {
   })
   const [sortBy, setSortBy]           = useState<'publishedAt' | 'relevancy'>('publishedAt')
   const [articles, setArticles]       = useState<NewsArticle[]>([])
+  const [domestic, setDomestic]       = useState<NewsArticle[]>([])
   const [cachedAt, setCachedAt]       = useState<string | null>(null)
   const [loading, setLoading]         = useState(true)
   const [error, setError]             = useState<string | null>(null)
@@ -187,7 +188,14 @@ export default function NewsPage() {
     setLoading(true)
     setError(null)
     try {
-      const params = new URLSearchParams({ tags: tag, sortBy: sort })
+      const storedToken = localStorage.getItem('auth-token')
+      const headers: Record<string, string> = storedToken ? { Authorization: `Bearer ${storedToken}` } : {}
+      // 국가 설정 가져오기
+      const settingsRes = await fetch('/api/settings', { headers }).catch(() => null)
+      const settings = settingsRes?.ok ? await settingsRes.json() : null
+      const country = settings?.countryCode
+
+      const params = new URLSearchParams({ tag, sortBy: sort, ...(country ? { country } : {}) })
       const res = await fetch(`/api/news?${params}`, { signal: abortRef.current.signal })
       if (!res.ok) {
         const body = await res.json().catch(() => ({ error: '뉴스를 불러오지 못했습니다' }))
@@ -196,8 +204,9 @@ export default function NewsPage() {
         setArticles([])
         return
       }
-      const data: NewsResponse & { fromCache?: boolean } = await res.json()
-      setArticles(data.articles)
+      const data = await res.json()
+      setArticles(data.international ?? data.articles ?? [])
+      setDomestic(data.domestic ?? [])
       setCachedAt(data.cachedAt)
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') return
@@ -320,13 +329,30 @@ export default function NewsPage() {
           </div>
         )}
 
-        {/* ── 뉴스 카드 그리드 ─────────────────────────────────── */}
+        {/* ── 해외 뉴스 그리드 ─────────────────────────────────── */}
+        {selectedTag !== '전체' && (
+          <p className="text-sm font-semibold text-text-primary flex items-center gap-1.5">
+            📌 <span className="text-accent">{selectedTag}</span> 관련 기사
+          </p>
+        )}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
           {loading
             ? Array.from({ length: 6 }).map((_, i) => <NewsCardSkeleton key={i} />)
             : articles.map((article) => <NewsCard key={article.id} article={article} />)
           }
         </div>
+
+        {/* ── 국내 관련 뉴스 ───────────────────────────────────── */}
+        {!loading && domestic.length > 0 && (
+          <div className="mt-6">
+            <p className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-1.5">
+              🇰🇷 국내 관련 뉴스
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+              {domestic.map((article) => <NewsCard key={article.id} article={article} />)}
+            </div>
+          </div>
+        )}
 
         {/* ── 빈 상태 ──────────────────────────────────────────── */}
         {!loading && !error && articles.length === 0 && (

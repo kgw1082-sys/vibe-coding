@@ -7,6 +7,19 @@ export interface KeywordEntry {
   description: string
 }
 
+export type CountryCode = 'US' | 'GB' | 'DE' | 'SG' | 'JP' | 'CN' | 'AE' | 'FR'
+
+export const COUNTRIES: { code: CountryCode; flag: string; name: string; currency: string }[] = [
+  { code: 'US', flag: '🇺🇸', name: '미국',      currency: 'USD' },
+  { code: 'GB', flag: '🇬🇧', name: '영국',      currency: 'GBP' },
+  { code: 'DE', flag: '🇩🇪', name: '독일',      currency: 'EUR' },
+  { code: 'SG', flag: '🇸🇬', name: '싱가포르',  currency: 'SGD' },
+  { code: 'JP', flag: '🇯🇵', name: '일본',      currency: 'JPY' },
+  { code: 'CN', flag: '🇨🇳', name: '중국',      currency: 'CNY' },
+  { code: 'AE', flag: '🇦🇪', name: 'UAE',       currency: 'AED' },
+  { code: 'FR', flag: '🇫🇷', name: '프랑스',    currency: 'EUR' },
+]
+
 export interface UserSettings {
   newsTags: string[]
   customKeywords: KeywordEntry[]
@@ -15,6 +28,7 @@ export interface UserSettings {
     redFlag: boolean
     lawUpdate: boolean
   }
+  countryCode?: CountryCode
 }
 
 const DEFAULT_SETTINGS: UserSettings = {

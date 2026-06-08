@@ -12,6 +12,7 @@ import {
   Plus, ChevronRight, Clock, TrendingUp, CalendarDays, Trash2,
 } from 'lucide-react'
 import { getEventsForDate, deleteEvent, toDateStr, type ScheduleEvent } from '@/lib/schedule'
+import { COUNTRIES } from '@/lib/user-settings'
 import type { NewsArticle } from '@/types'
 
 const SHORTCUTS = [
@@ -41,6 +42,9 @@ export default function DashboardPage() {
   const [todayStr, setTodayStr] = useState('')
   const [todayEvents, setTodayEvents] = useState<ScheduleEvent[]>([])
   const [news, setNews] = useState<NewsArticle[]>([])
+  const [exchangeRate, setExchangeRate] = useState<{
+    currency: string; rate: number; change?: number
+  } | null>(null)
   const { user } = useAuth()
   const router = useRouter()
 
@@ -53,6 +57,29 @@ export default function DashboardPage() {
   useEffect(() => {
     setTodayStr(todayLabel())
     refreshEvents()
+    // Onboarding check
+    if (!localStorage.getItem('onboarding-done')) {
+      fetch('/api/settings', {
+        headers: localStorage.getItem('auth-token') ? { Authorization: `Bearer ${localStorage.getItem('auth-token')}` } : {},
+      }).then(r => r.ok ? r.json() : null).then(data => {
+        if (!data?.countryCode) router.push('/onboarding')
+        else localStorage.setItem('onboarding-done', '1')
+      }).catch(() => null)
+    }
+    // Fetch exchange rate
+    const storedToken = localStorage.getItem('auth-token')
+    const headers: Record<string, string> = storedToken ? { Authorization: `Bearer ${storedToken}` } : {}
+    fetch('/api/settings', { headers })
+      .then(r => r.ok ? r.json() : null)
+      .then(async (settings) => {
+        const country = COUNTRIES.find(c => c.code === settings?.countryCode) ?? COUNTRIES[0]
+        if (country.currency === 'KRW') return
+        const rateRes = await fetch(`/api/exchange-rate?base=${country.currency}`)
+        if (!rateRes.ok) return
+        const data = await rateRes.json()
+        const krwRate = data.rates?.KRW
+        if (krwRate) setExchangeRate({ currency: country.currency, rate: krwRate })
+      }).catch(() => null)
     // 실시간 뉴스 fetch
     fetch('/api/news')
       .then((r) => r.ok ? r.json() : null)
@@ -125,6 +152,26 @@ export default function DashboardPage() {
             </Link>
           )}
         </section>
+
+        {/* 환율 위젯 */}
+        {exchangeRate && (
+          <section>
+            <Card className="bg-bg-card border-border-color">
+              <CardContent className="py-3 px-4 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">💱</span>
+                  <div>
+                    <p className="text-xs text-text-muted">실시간 환율</p>
+                    <p className="text-sm font-bold text-text-primary">
+                      1 {exchangeRate.currency} = {exchangeRate.rate.toLocaleString('ko-KR', { maximumFractionDigits: 2 })} KRW
+                    </p>
+                  </div>
+                </div>
+                <span className="text-[11px] text-text-disabled">1시간 캐시</span>
+              </CardContent>
+            </Card>
+          </section>
+        )}
 
         {/* [3] 오늘의 주요 뉴스 */}
         <section>

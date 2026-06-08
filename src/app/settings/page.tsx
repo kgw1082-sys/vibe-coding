@@ -9,20 +9,31 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
-import { Tag, AlertTriangle, Bell, X, Plus } from 'lucide-react'
+import { Tag, AlertTriangle, Bell, X, Plus, Globe } from 'lucide-react'
 import { NEWS_TAGS } from '@/lib/mock-data'
 import { RED_FLAG_KEYWORDS, ORANGE_FLAG_KEYWORDS } from '@/lib/clause-keywords'
-import { loadSettings, saveSettings } from '@/lib/user-settings'
-import type { UserSettings, KeywordEntry } from '@/lib/user-settings'
+import { loadSettings, saveSettings, COUNTRIES } from '@/lib/user-settings'
+import type { UserSettings, KeywordEntry, CountryCode } from '@/lib/user-settings'
 
 export default function SettingsPage() {
   const [settings, setSettings] = useState<UserSettings | null>(null)
   const [newKeyword, setNewKeyword] = useState('')
   const [newKeywordLevel, setNewKeywordLevel] = useState<'red' | 'orange'>('red')
   const [newKeywordDesc, setNewKeywordDesc] = useState('')
+  const [currentCountry, setCurrentCountry] = useState<CountryCode | null>(null)
+  const [showCountryModal, setShowCountryModal] = useState(false)
+  const [savingCountry, setSavingCountry] = useState(false)
 
   useEffect(() => {
     setSettings(loadSettings())
+  }, [])
+
+  useEffect(() => {
+    const token = localStorage.getItem('auth-token')
+    fetch('/api/settings', { headers: token ? { Authorization: `Bearer ${token}` } : {} })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data?.countryCode) setCurrentCountry(data.countryCode) })
+      .catch(() => null)
   }, [])
 
   const persist = useCallback((next: UserSettings) => {
@@ -69,6 +80,27 @@ export default function SettingsPage() {
     persist({ ...settings, customKeywords })
   }
 
+  const saveCountry = async (code: CountryCode) => {
+    setSavingCountry(true)
+    try {
+      const token = localStorage.getItem('auth-token')
+      const res = await fetch('/api/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: JSON.stringify({ countryCode: code }),
+      })
+      if (res.ok) {
+        setCurrentCountry(code)
+        setShowCountryModal(false)
+        toast.success('국가 설정이 변경되었습니다.')
+      } else {
+        toast.error('저장에 실패했습니다.')
+      }
+    } finally {
+      setSavingCountry(false)
+    }
+  }
+
   if (!settings) return null
 
   return (
@@ -76,6 +108,40 @@ export default function SettingsPage() {
       <Topbar title="설정" description="Hanwha Global Insurance Intelligence 환경 설정" />
 
       <div className="flex-1 overflow-y-auto p-5 space-y-4 max-w-2xl">
+
+        {/* 파견 국가 설정 */}
+        <Card className="bg-bg-card border-border-color">
+          <CardHeader className="pb-3 flex flex-row items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-accent/15 flex items-center justify-center">
+              <Globe size={14} className="text-accent" />
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-sm font-semibold text-white">파견 국가 설정</CardTitle>
+              <p className="text-xs text-text-muted">뉴스, 법령, 환율 기준 국가</p>
+            </div>
+            <Button size="sm" variant="outline" onClick={() => setShowCountryModal(true)}
+              className="h-7 text-xs border-border-color text-text-secondary hover:text-text-primary">
+              변경
+            </Button>
+          </CardHeader>
+          <Separator className="bg-white/10 mb-3" />
+          <CardContent>
+            {currentCountry ? (() => {
+              const c = COUNTRIES.find(x => x.code === currentCountry)
+              return c ? (
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{c.flag}</span>
+                  <div>
+                    <p className="text-sm font-semibold text-text-primary">{c.name}</p>
+                    <p className="text-xs text-text-muted">{c.currency}</p>
+                  </div>
+                </div>
+              ) : null
+            })() : (
+              <p className="text-sm text-text-disabled">국가가 설정되지 않았습니다</p>
+            )}
+          </CardContent>
+        </Card>
 
         {/* 뉴스 관심 태그 */}
         <Card className="bg-bg-card border-border-color">
@@ -244,6 +310,30 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
       </div>
+
+      {showCountryModal && (
+        <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-4">
+          <div className="bg-bg-surface rounded-2xl border border-border-color shadow-lg w-full max-w-md p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-text-primary">파견 국가 변경</h3>
+              <button onClick={() => setShowCountryModal(false)} className="text-text-disabled hover:text-text-primary">
+                <X size={16} />
+              </button>
+            </div>
+            <div className="grid grid-cols-4 gap-2">
+              {COUNTRIES.map((c) => (
+                <button key={c.code} onClick={() => saveCountry(c.code as CountryCode)} disabled={savingCountry}
+                  className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all ${
+                    currentCountry === c.code ? 'border-accent bg-accent/10' : 'border-border-color hover:border-accent/40'
+                  }`}>
+                  <span className="text-2xl">{c.flag}</span>
+                  <span className="text-[11px] font-medium text-text-primary">{c.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }

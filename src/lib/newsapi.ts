@@ -2,14 +2,38 @@ import { parseStringPromise } from 'xml2js'
 import type { NewsArticle } from '@/types'
 
 // ── 신뢰할 수 있는 보험 전문 RSS 피드 ──────────────────────────────────
-const RSS_SOURCES = [
-  { url: 'https://www.insurancejournal.com/feed/',            source: 'Insurance Journal' },
-  { url: 'https://www.reinsurancene.ws/feed/',                source: 'Reinsurance News' },
-  { url: 'https://www.carriermanagement.com/feed/',           source: 'Carrier Management' },
-  { url: 'https://www.businessinsurance.com/rss/news.rss',   source: 'Business Insurance' },
-  { url: 'https://www.insurancebusinessmag.com/rss/',        source: 'Insurance Business' },
-  { url: 'https://news.google.com/rss/search?q=reinsurance+insurance+US&hl=en-US&gl=US&ceid=US:en', source: 'Google News' },
+const RSS_SOURCES_BASE = [
+  { url: 'https://www.insurancejournal.com/feed/',          source: 'Insurance Journal',  lang: 'en' },
+  { url: 'https://www.reinsurancene.ws/feed/',              source: 'Reinsurance News',   lang: 'en' },
+  { url: 'https://www.carriermanagement.com/feed/',         source: 'Carrier Management', lang: 'en' },
+  { url: 'https://www.businessinsurance.com/rss/news.rss', source: 'Business Insurance', lang: 'en' },
+  { url: 'https://www.insurancebusinessmag.com/rss/',      source: 'Insurance Business', lang: 'en' },
+  // 국내 보험 뉴스 RSS
+  { url: 'https://news.google.com/rss/search?q=손해보험+재보험+보험업&hl=ko&gl=KR&ceid=KR:ko', source: '국내 보험뉴스', lang: 'ko' },
+  { url: 'https://news.google.com/rss/search?q=한화손해보험+삼성화재+DB손해보험&hl=ko&gl=KR&ceid=KR:ko', source: '국내 보험사', lang: 'ko' },
 ]
+
+// 국가별 Google News 쿼리
+const COUNTRY_RSS: Record<string, { url: string; source: string; lang: string }> = {
+  US: { url: 'https://news.google.com/rss/search?q=US+insurance+reinsurance&hl=en-US&gl=US&ceid=US:en', source: 'Google News US', lang: 'en' },
+  GB: { url: 'https://news.google.com/rss/search?q=UK+insurance+reinsurance+Lloyd%27s&hl=en-GB&gl=GB&ceid=GB:en', source: 'Google News UK', lang: 'en' },
+  DE: { url: 'https://news.google.com/rss/search?q=Germany+insurance+Munich+Re+Allianz&hl=de&gl=DE&ceid=DE:de', source: 'Google News DE', lang: 'de' },
+  SG: { url: 'https://news.google.com/rss/search?q=Singapore+insurance+reinsurance&hl=en-SG&gl=SG&ceid=SG:en', source: 'Google News SG', lang: 'en' },
+  JP: { url: 'https://news.google.com/rss/search?q=Japan+insurance+再保険&hl=ja&gl=JP&ceid=JP:ja', source: 'Google News JP', lang: 'ja' },
+  CN: { url: 'https://news.google.com/rss/search?q=China+insurance+reinsurance+PICC&hl=zh-CN&gl=CN&ceid=CN:zh-Hans', source: 'Google News CN', lang: 'zh' },
+  AE: { url: 'https://news.google.com/rss/search?q=UAE+insurance+reinsurance+Dubai&hl=en&gl=AE&ceid=AE:en', source: 'Google News UAE', lang: 'en' },
+  FR: { url: 'https://news.google.com/rss/search?q=France+insurance+reinsurance+AXA+SCOR&hl=fr&gl=FR&ceid=FR:fr', source: 'Google News FR', lang: 'fr' },
+}
+
+function getRssSources(countryCode?: string) {
+  const sources = [...RSS_SOURCES_BASE]
+  if (countryCode && COUNTRY_RSS[countryCode]) {
+    sources.push(COUNTRY_RSS[countryCode])
+  } else {
+    sources.push({ url: 'https://news.google.com/rss/search?q=reinsurance+insurance+US&hl=en-US&gl=US&ceid=US:en', source: 'Google News', lang: 'en' })
+  }
+  return sources
+}
 
 const TAG_MAP: Record<string, string[]> = {
   'P&C Insurance':    ['p&c', 'property', 'casualty', 'homeowner', 'auto insurance', 'liability'],
@@ -81,9 +105,13 @@ async function fetchSingleRss(source: { url: string; source: string }): Promise<
   }
 }
 
-// ── 전체 피드 병렬 수집 → 최신순 정렬 ────────────────────────────────────
-export async function fetchNews(tagFilter?: string): Promise<NewsArticle[]> {
-  const results = await Promise.allSettled(RSS_SOURCES.map(fetchSingleRss))
+// ── 전체 피드 병렬 수집 → 국내/해외 분리 후 최신순 정렬 ──────────────────
+export async function fetchNews(tagFilter?: string, countryCode?: string): Promise<{
+  international: NewsArticle[]
+  domestic: NewsArticle[]
+}> {
+  const sources = getRssSources(countryCode)
+  const results = await Promise.allSettled(sources.map(fetchSingleRss))
   const all = results.flatMap((r) => r.status === 'fulfilled' ? r.value : [])
 
   // 중복 URL 제거
@@ -94,11 +122,24 @@ export async function fetchNews(tagFilter?: string): Promise<NewsArticle[]> {
     return true
   })
 
-  // 태그 필터링
+  // 커스텀 태그 검색 (태그명을 직접 검색어로 사용)
   const filtered = tagFilter && tagFilter !== '전체'
-    ? unique.filter((a) => a.tags.some((t) => t === tagFilter) || a.tags.length === 0)
+    ? unique.filter((a) => {
+        const text = `${a.title} ${a.description}`.toLowerCase()
+        const tag = tagFilter.toLowerCase()
+        return a.tags.some((t) => t === tagFilter) || text.includes(tag)
+      })
     : unique
 
-  // 최신순 정렬
-  return filtered.sort((a, b) => parseDate(b.publishedAt) - parseDate(a.publishedAt))
+  const sorted = filtered.sort((a, b) => parseDate(b.publishedAt) - parseDate(a.publishedAt))
+
+  // 국내/해외 분리 (source가 '국내' 포함하거나 한글이 포함된 기사)
+  const domestic = sorted.filter((a) =>
+    a.source.includes('국내') || /[가-힣]/.test(a.title)
+  )
+  const international = sorted.filter((a) =>
+    !a.source.includes('국내') && !/[가-힣]/.test(a.title)
+  )
+
+  return { international, domestic }
 }
